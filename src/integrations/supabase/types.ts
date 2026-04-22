@@ -205,6 +205,7 @@ export type Database = {
       profiles: {
         Row: {
           bio: string | null
+          codechef_url: string | null
           created_at: string
           email: string | null
           github_url: string | null
@@ -215,6 +216,7 @@ export type Database = {
           linkedin_url: string | null
           location: string | null
           name: string
+          portfolio_url: string | null
           profile_pic_url: string | null
           resume_url: string | null
           tagline: string | null
@@ -223,6 +225,7 @@ export type Database = {
         }
         Insert: {
           bio?: string | null
+          codechef_url?: string | null
           created_at?: string
           email?: string | null
           github_url?: string | null
@@ -233,6 +236,7 @@ export type Database = {
           linkedin_url?: string | null
           location?: string | null
           name?: string
+          portfolio_url?: string | null
           profile_pic_url?: string | null
           resume_url?: string | null
           tagline?: string | null
@@ -241,6 +245,7 @@ export type Database = {
         }
         Update: {
           bio?: string | null
+          codechef_url?: string | null
           created_at?: string
           email?: string | null
           github_url?: string | null
@@ -251,6 +256,7 @@ export type Database = {
           linkedin_url?: string | null
           location?: string | null
           name?: string
+          portfolio_url?: string | null
           profile_pic_url?: string | null
           resume_url?: string | null
           tagline?: string | null

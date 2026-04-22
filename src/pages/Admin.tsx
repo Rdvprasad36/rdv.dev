@@ -52,6 +52,8 @@ export default function Admin() {
       github_url: form.github_url,
       linkedin_url: form.linkedin_url,
       twitter_url: form.twitter_url,
+      codechef_url: form.codechef_url,
+      portfolio_url: form.portfolio_url,
       github_username: form.github_username,
       leetcode_username: form.leetcode_username,
     };
@@ -125,6 +127,16 @@ export default function Admin() {
               <div>
                 <Label>Twitter URL</Label>
                 <Input value={form.twitter_url ?? ""} onChange={(e) => setForm({ ...form, twitter_url: e.target.value })} />
+              </div>
+            </div>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div>
+                <Label>CodeChef URL</Label>
+                <Input value={form.codechef_url ?? ""} onChange={(e) => setForm({ ...form, codechef_url: e.target.value })} />
+              </div>
+              <div>
+                <Label>Portfolio URL</Label>
+                <Input value={form.portfolio_url ?? ""} onChange={(e) => setForm({ ...form, portfolio_url: e.target.value })} />
               </div>
             </div>
             <div className="grid sm:grid-cols-2 gap-4">

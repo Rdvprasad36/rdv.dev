@@ -14,6 +14,8 @@ export type Profile = {
   github_url: string | null;
   linkedin_url: string | null;
   twitter_url: string | null;
+  codechef_url: string | null;
+  portfolio_url: string | null;
   github_username: string | null;
   leetcode_username: string | null;
 };

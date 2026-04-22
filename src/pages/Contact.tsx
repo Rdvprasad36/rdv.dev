@@ -8,7 +8,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Github, Linkedin, Twitter, Mail, MapPin, Send } from "lucide-react";
+import { Github, Linkedin, Twitter, Mail, MapPin, Send, Code2, Globe } from "lucide-react";
 import { z } from "zod";
 
 const schema = z.object({
@@ -70,6 +70,27 @@ export default function Contact() {
             {profile?.linkedin_url && (
               <a href={profile.linkedin_url} target="_blank" rel="noreferrer" className="p-2.5 rounded-md bg-secondary hover:bg-accent transition-colors">
                 <Linkedin className="h-4 w-4" />
+              </a>
+            )}
+            {profile?.leetcode_username && (
+              <a
+                href={`https://leetcode.com/u/${profile.leetcode_username}/`}
+                target="_blank"
+                rel="noreferrer"
+                className="p-2.5 rounded-md bg-secondary hover:bg-accent transition-colors text-xs font-semibold"
+                aria-label="LeetCode"
+              >
+                LC
+              </a>
+            )}
+            {profile?.codechef_url && (
+              <a href={profile.codechef_url} target="_blank" rel="noreferrer" className="p-2.5 rounded-md bg-secondary hover:bg-accent transition-colors" aria-label="CodeChef">
+                <Code2 className="h-4 w-4" />
+              </a>
+            )}
+            {profile?.portfolio_url && (
+              <a href={profile.portfolio_url} target="_blank" rel="noreferrer" className="p-2.5 rounded-md bg-secondary hover:bg-accent transition-colors" aria-label="Portfolio">
+                <Globe className="h-4 w-4" />
               </a>
             )}
             {profile?.twitter_url && (

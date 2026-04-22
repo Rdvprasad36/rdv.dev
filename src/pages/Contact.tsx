@@ -30,7 +30,8 @@ export default function Contact() {
       return;
     }
     setSubmitting(true);
-    const { error } = await supabase.from("inquiries").insert(parsed.data);
+    const { name, email, message } = parsed.data;
+    const { error } = await supabase.from("inquiries").insert({ name, email, message });
     setSubmitting(false);
     if (error) {
       toast.error(error.message);

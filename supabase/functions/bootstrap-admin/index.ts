@@ -1,6 +1,11 @@
 // Bootstrap the very first admin: if no admin exists yet, grant the supplied user_id the admin role.
-import { createClient } from "@supabase/supabase-js";
-import { corsHeaders } from "@supabase/supabase-js/cors";
+import { createClient } from "npm:@supabase/supabase-js@2";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+};
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -19,7 +24,6 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Check whether any admin already exists
     const { count, error: countError } = await supabase
       .from("user_roles")
       .select("*", { count: "exact", head: true })

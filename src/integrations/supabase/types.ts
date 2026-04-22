@@ -14,16 +14,365 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      achievements: {
+        Row: {
+          created_at: string
+          date: string | null
+          description: string | null
+          icon: string | null
+          id: string
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          date?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          date?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      education: {
+        Row: {
+          created_at: string
+          degree: string | null
+          description: string | null
+          duration: string | null
+          field: string | null
+          id: string
+          institution: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          degree?: string | null
+          description?: string | null
+          duration?: string | null
+          field?: string | null
+          id?: string
+          institution: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          degree?: string | null
+          description?: string | null
+          duration?: string | null
+          field?: string | null
+          id?: string
+          institution?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      experience: {
+        Row: {
+          company: string
+          created_at: string
+          description: string | null
+          duration: string | null
+          id: string
+          role: string
+          sort_order: number
+          tech: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          company: string
+          created_at?: string
+          description?: string | null
+          duration?: string | null
+          id?: string
+          role: string
+          sort_order?: number
+          tech?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          company?: string
+          created_at?: string
+          description?: string | null
+          duration?: string | null
+          id?: string
+          role?: string
+          sort_order?: number
+          tech?: string[] | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      inquiries: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          is_read: boolean
+          message: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          is_read?: boolean
+          message: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          is_read?: boolean
+          message?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      post_likes: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          visitor_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          visitor_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          visitor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      posts: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          image_url: string | null
+          likes_count: number
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          likes_count?: number
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          likes_count?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          bio: string | null
+          created_at: string
+          email: string | null
+          github_url: string | null
+          github_username: string | null
+          id: string
+          is_available: boolean
+          leetcode_username: string | null
+          linkedin_url: string | null
+          location: string | null
+          name: string
+          profile_pic_url: string | null
+          resume_url: string | null
+          tagline: string | null
+          twitter_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string
+          email?: string | null
+          github_url?: string | null
+          github_username?: string | null
+          id?: string
+          is_available?: boolean
+          leetcode_username?: string | null
+          linkedin_url?: string | null
+          location?: string | null
+          name?: string
+          profile_pic_url?: string | null
+          resume_url?: string | null
+          tagline?: string | null
+          twitter_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string
+          email?: string | null
+          github_url?: string | null
+          github_username?: string | null
+          id?: string
+          is_available?: boolean
+          leetcode_username?: string | null
+          linkedin_url?: string | null
+          location?: string | null
+          name?: string
+          profile_pic_url?: string | null
+          resume_url?: string | null
+          tagline?: string | null
+          twitter_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      projects: {
+        Row: {
+          created_at: string
+          description: string | null
+          featured: boolean
+          id: string
+          image_url: string | null
+          live_url: string | null
+          repo_url: string | null
+          sort_order: number
+          tech_stack: string[] | null
+          timeline: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          featured?: boolean
+          id?: string
+          image_url?: string | null
+          live_url?: string | null
+          repo_url?: string | null
+          sort_order?: number
+          tech_stack?: string[] | null
+          timeline?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          featured?: boolean
+          id?: string
+          image_url?: string | null
+          live_url?: string | null
+          repo_url?: string | null
+          sort_order?: number
+          tech_stack?: string[] | null
+          timeline?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      skills: {
+        Row: {
+          category: string | null
+          created_at: string
+          icon: string | null
+          id: string
+          name: string
+          proficiency: number | null
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name: string
+          proficiency?: number | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name?: string
+          proficiency?: number | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +499,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const

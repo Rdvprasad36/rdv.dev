@@ -269,7 +269,7 @@ export default function Overview() {
       </motion.div>
 
       {/* ABOUT ME card with dynamic highlight tiles */}
-      {(profile?.bio || overviewSections.length > 0) && (
+      {(profile?.bio || overviewSections.length > 0 || isAdmin) && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -376,11 +376,27 @@ export default function Overview() {
       {/* TWO-COLUMN: Experience & Skills */}
       <div className="grid lg:grid-cols-[1.6fr,1fr] gap-6">
         {/* EXPERIENCE TIMELINE */}
-        {experience.length > 0 && (
+        {(experience.length > 0 || isAdmin) && (
           <Card className="p-6 md:p-8">
             <div className="flex items-center gap-2 mb-6">
               <Briefcase className="h-5 w-5 text-primary" />
               <h2 className="text-xl font-bold">Experience</h2>
+              {isAdmin && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="ml-auto"
+                  onClick={() =>
+                    addRow(
+                      "experience",
+                      { role: "New role", company: "Company", duration: "", sort_order: 999 },
+                      "experience"
+                    )
+                  }
+                >
+                  <Plus className="h-3.5 w-3.5 mr-1.5" /> Add
+                </Button>
+              )}
             </div>
             <div className="relative pl-7 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-px before:bg-border">
               {(experience as any[]).map((exp, i) => (
@@ -390,7 +406,7 @@ export default function Overview() {
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: i * 0.05 }}
-                  className="relative"
+                  className="relative group"
                 >
                   <span className="absolute -left-[22px] top-1.5 h-3 w-3 rounded-full bg-primary ring-4 ring-background" />
                   <div className="flex flex-wrap items-baseline justify-between gap-2 mb-1">
@@ -404,6 +420,32 @@ export default function Overview() {
                       {exp.tech.map((t: string) => (
                         <span key={t} className="text-[11px] px-2 py-0.5 rounded bg-secondary text-secondary-foreground font-mono">{t}</span>
                       ))}
+                    </div>
+                  )}
+                  {isAdmin && (
+                    <div className="absolute top-0 right-0 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <InlineEdit
+                        table="experience"
+                        rowId={exp.id}
+                        row={exp}
+                        invalidateKeys={["experience"]}
+                        label="Edit experience"
+                        fields={[
+                          { key: "role", label: "Role" },
+                          { key: "company", label: "Company" },
+                          { key: "duration", label: "Duration" },
+                          { key: "description", label: "Description", type: "textarea" },
+                        ]}
+                      />
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7"
+                        onClick={() => removeRow("experience", exp.id, "experience")}
+                        aria-label="Delete"
+                      >
+                        <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                      </Button>
                     </div>
                   )}
                 </motion.div>

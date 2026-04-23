@@ -308,7 +308,7 @@ export default function Overview() {
               <h2 className="text-xl font-bold">Skills</h2>
             </div>
             <div className="space-y-5">
-              {Object.entries(skillsByCategory).map(([cat, list]) => (
+              {(Object.entries(skillsByCategory) as [string, any[]][]).map(([cat, list]) => (
                 <div key={cat}>
                   <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-2">{cat}</p>
                   <div className="grid grid-cols-2 gap-2">

@@ -3,7 +3,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Download,
@@ -21,9 +21,14 @@ import {
   Layers,
   Palette,
   Monitor,
+  Plus,
+  Trash2,
 } from "lucide-react";
 import profileDefault from "@/assets/profile-default.jpg";
 import { motion } from "framer-motion";
+import { InlineEdit } from "@/components/admin/InlineEdit";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   Layers,
@@ -40,6 +45,41 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
 
 export default function Overview() {
   const { data: profile, isLoading } = useProfile();
+  const { isAdmin } = useAuth();
+  const queryClient = useQueryClient();
+
+  async function addOverviewSection() {
+    const { error } = await supabase
+      .from("overview_sections")
+      .insert({ title: "New section", description: "", icon: "Layers", sort_order: 999 });
+    if (error) return toast.error(error.message);
+    toast.success("Card added");
+    queryClient.invalidateQueries({ queryKey: ["overview_sections"] });
+  }
+
+  async function removeOverviewSection(id: string) {
+    if (!confirm("Delete this card?")) return;
+    const { error } = await supabase.from("overview_sections").delete().eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success("Deleted");
+    queryClient.invalidateQueries({ queryKey: ["overview_sections"] });
+  }
+
+  async function removeRow(table: string, id: string, queryKey: string) {
+    if (!confirm("Delete this entry?")) return;
+    const { error } = await (supabase.from(table as any) as any).delete().eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success("Deleted");
+    queryClient.invalidateQueries({ queryKey: [queryKey] });
+  }
+
+  async function addRow(table: string, payload: any, queryKey: string) {
+    const { error } = await (supabase.from(table as any) as any).insert(payload);
+    if (error) return toast.error(error.message);
+    toast.success("Added");
+    queryClient.invalidateQueries({ queryKey: [queryKey] });
+  }
+
 
   const { data: experience = [] } = useQuery({
     queryKey: ["experience"],
@@ -105,6 +145,32 @@ export default function Overview() {
           <div className="absolute inset-0 bg-gradient-hero opacity-50" />
           <div className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-primary/20 blur-3xl" />
 
+          {isAdmin && (
+            <div className="absolute top-3 right-3 z-10 flex gap-2">
+              <InlineEdit
+                table="profiles"
+                rowId={profile?.id ?? null}
+                row={profile ?? {}}
+                invalidateKeys={["profile"]}
+                size="sm"
+                label="Edit profile"
+                fields={[
+                  { key: "name", label: "Name" },
+                  { key: "tagline", label: "Tagline" },
+                  { key: "phone", label: "Phone", placeholder: "7382612327" },
+                  { key: "email", label: "Email" },
+                  { key: "location", label: "Location" },
+                  { key: "portfolio_url", label: "Portfolio URL", type: "url" },
+                  { key: "linkedin_url", label: "LinkedIn URL", type: "url" },
+                  { key: "github_url", label: "GitHub URL", type: "url" },
+                  { key: "codechef_url", label: "CodeChef URL", type: "url" },
+                  { key: "profile_pic_url", label: "Profile photo", type: "image" },
+                  { key: "resume_url", label: "Resume PDF", type: "resume" },
+                  { key: "is_available", label: "Available for work", type: "switch" },
+                ]}
+              />
+            </div>
+          )}
           <div className="relative grid md:grid-cols-[auto,1fr] gap-6 md:gap-10 items-center">
             <div className="relative mx-auto md:mx-0">
               <div className="absolute -inset-3 bg-gradient-primary rounded-full opacity-40 blur-xl" />
@@ -203,7 +269,7 @@ export default function Overview() {
       </motion.div>
 
       {/* ABOUT ME card with dynamic highlight tiles */}
-      {(profile?.bio || overviewSections.length > 0) && (
+      {(profile?.bio || overviewSections.length > 0 || isAdmin) && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -214,6 +280,19 @@ export default function Overview() {
             <div className="flex items-center gap-2 mb-4">
               <FileText className="h-5 w-5 text-primary" />
               <h2 className="text-xl font-bold">About Me</h2>
+              {isAdmin && (
+                <div className="ml-auto">
+                  <InlineEdit
+                    table="profiles"
+                    rowId={profile?.id ?? null}
+                    row={profile ?? {}}
+                    invalidateKeys={["profile"]}
+                    size="sm"
+                    label="Edit bio"
+                    fields={[{ key: "bio", label: "Bio", type: "textarea" }]}
+                  />
+                </div>
+              )}
             </div>
             {profile?.bio && (
               <p className="text-sm md:text-base text-muted-foreground leading-relaxed mb-6">
@@ -221,7 +300,7 @@ export default function Overview() {
               </p>
             )}
 
-            {overviewSections.length > 0 && (
+            {(overviewSections.length > 0 || isAdmin) && (
               <div className="grid md:grid-cols-2 gap-5 pt-2 border-t border-border/40">
                 {(overviewSections as any[]).map((sec, i) => {
                   const Icon = ICON_MAP[sec.icon || ""] || Layers;
@@ -232,20 +311,53 @@ export default function Overview() {
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
                       transition={{ duration: 0.4, delay: i * 0.08 }}
-                      className="flex gap-3 pt-5"
+                      className="relative flex gap-3 pt-5 group"
                     >
                       <div className="shrink-0 p-2.5 rounded-lg bg-primary/10 h-fit">
                         <Icon className="h-5 w-5 text-primary" />
                       </div>
-                      <div>
+                      <div className="flex-1">
                         <h3 className="font-semibold mb-1">{sec.title}</h3>
                         {sec.description && (
                           <p className="text-sm text-muted-foreground leading-relaxed">{sec.description}</p>
                         )}
                       </div>
+                      {isAdmin && (
+                        <div className="absolute top-4 right-0 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <InlineEdit
+                            table="overview_sections"
+                            rowId={sec.id}
+                            row={sec}
+                            invalidateKeys={["overview_sections"]}
+                            label="Edit card"
+                            fields={[
+                              { key: "title", label: "Title" },
+                              { key: "description", label: "Description", type: "textarea" },
+                              { key: "icon", label: "Icon (Layers, Palette, Monitor, Github, Code2, Award, Briefcase, GraduationCap, Globe, FileText)" },
+                            ]}
+                          />
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7"
+                            onClick={() => removeOverviewSection(sec.id)}
+                            aria-label="Delete card"
+                          >
+                            <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                          </Button>
+                        </div>
+                      )}
                     </motion.div>
                   );
                 })}
+                {isAdmin && (
+                  <button
+                    onClick={addOverviewSection}
+                    className="pt-5 flex items-center justify-center gap-2 text-sm text-muted-foreground border-2 border-dashed border-border rounded-lg p-6 hover:border-primary/50 hover:text-primary transition-colors"
+                  >
+                    <Plus className="h-4 w-4" /> Add highlight card
+                  </button>
+                )}
               </div>
             )}
 
@@ -264,11 +376,27 @@ export default function Overview() {
       {/* TWO-COLUMN: Experience & Skills */}
       <div className="grid lg:grid-cols-[1.6fr,1fr] gap-6">
         {/* EXPERIENCE TIMELINE */}
-        {experience.length > 0 && (
+        {(experience.length > 0 || isAdmin) && (
           <Card className="p-6 md:p-8">
             <div className="flex items-center gap-2 mb-6">
               <Briefcase className="h-5 w-5 text-primary" />
               <h2 className="text-xl font-bold">Experience</h2>
+              {isAdmin && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="ml-auto"
+                  onClick={() =>
+                    addRow(
+                      "experience",
+                      { role: "New role", company: "Company", duration: "", sort_order: 999 },
+                      "experience"
+                    )
+                  }
+                >
+                  <Plus className="h-3.5 w-3.5 mr-1.5" /> Add
+                </Button>
+              )}
             </div>
             <div className="relative pl-7 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-px before:bg-border">
               {(experience as any[]).map((exp, i) => (
@@ -278,7 +406,7 @@ export default function Overview() {
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: i * 0.05 }}
-                  className="relative"
+                  className="relative group"
                 >
                   <span className="absolute -left-[22px] top-1.5 h-3 w-3 rounded-full bg-primary ring-4 ring-background" />
                   <div className="flex flex-wrap items-baseline justify-between gap-2 mb-1">
@@ -292,6 +420,32 @@ export default function Overview() {
                       {exp.tech.map((t: string) => (
                         <span key={t} className="text-[11px] px-2 py-0.5 rounded bg-secondary text-secondary-foreground font-mono">{t}</span>
                       ))}
+                    </div>
+                  )}
+                  {isAdmin && (
+                    <div className="absolute top-0 right-0 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <InlineEdit
+                        table="experience"
+                        rowId={exp.id}
+                        row={exp}
+                        invalidateKeys={["experience"]}
+                        label="Edit experience"
+                        fields={[
+                          { key: "role", label: "Role" },
+                          { key: "company", label: "Company" },
+                          { key: "duration", label: "Duration" },
+                          { key: "description", label: "Description", type: "textarea" },
+                        ]}
+                      />
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7"
+                        onClick={() => removeRow("experience", exp.id, "experience")}
+                        aria-label="Delete"
+                      >
+                        <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                      </Button>
                     </div>
                   )}
                 </motion.div>
@@ -326,11 +480,27 @@ export default function Overview() {
       </div>
 
       {/* EDUCATION */}
-      {education.length > 0 && (
+      {(education.length > 0 || isAdmin) && (
         <Card className="p-6 md:p-8">
           <div className="flex items-center gap-2 mb-6">
             <GraduationCap className="h-5 w-5 text-primary" />
             <h2 className="text-xl font-bold">Education</h2>
+            {isAdmin && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="ml-auto"
+                onClick={() =>
+                  addRow(
+                    "education",
+                    { institution: "New school", degree: "", field: "", duration: "", sort_order: 999 },
+                    "education"
+                  )
+                }
+              >
+                <Plus className="h-3.5 w-3.5 mr-1.5" /> Add
+              </Button>
+            )}
           </div>
           <div className="space-y-4">
             {(education as any[]).map((ed, i) => (
@@ -340,7 +510,7 @@ export default function Overview() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: i * 0.05 }}
-                className="relative pl-7 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-px before:bg-border"
+                className="relative pl-7 group before:absolute before:left-2 before:top-2 before:bottom-2 before:w-px before:bg-border"
               >
                 <span className="absolute left-1 top-1.5 h-3 w-3 rounded-full bg-primary ring-4 ring-background" />
                 <div className="flex flex-wrap items-baseline justify-between gap-2 mb-1">
@@ -349,6 +519,33 @@ export default function Overview() {
                 </div>
                 <p className="text-sm text-primary font-medium">{ed.degree} {ed.field && `· ${ed.field}`}</p>
                 {ed.description && <p className="text-sm text-muted-foreground mt-1.5">{ed.description}</p>}
+                {isAdmin && (
+                  <div className="absolute top-0 right-0 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <InlineEdit
+                      table="education"
+                      rowId={ed.id}
+                      row={ed}
+                      invalidateKeys={["education"]}
+                      label="Edit education"
+                      fields={[
+                        { key: "institution", label: "Institution" },
+                        { key: "degree", label: "Degree" },
+                        { key: "field", label: "Field" },
+                        { key: "duration", label: "Duration" },
+                        { key: "description", label: "Description", type: "textarea" },
+                      ]}
+                    />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7"
+                      onClick={() => removeRow("education", ed.id, "education")}
+                      aria-label="Delete"
+                    >
+                      <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                    </Button>
+                  </div>
+                )}
               </motion.div>
             ))}
           </div>
@@ -356,18 +553,59 @@ export default function Overview() {
       )}
 
       {/* ACHIEVEMENTS */}
-      {achievements.length > 0 && (
+      {(achievements.length > 0 || isAdmin) && (
         <Card className="p-6 md:p-8">
           <div className="flex items-center gap-2 mb-6">
             <Award className="h-5 w-5 text-primary" />
             <h2 className="text-xl font-bold">Achievements</h2>
+            {isAdmin && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="ml-auto"
+                onClick={() =>
+                  addRow(
+                    "achievements",
+                    { title: "New achievement", description: "", date: "", sort_order: 999 },
+                    "achievements"
+                  )
+                }
+              >
+                <Plus className="h-3.5 w-3.5 mr-1.5" /> Add
+              </Button>
+            )}
           </div>
           <div className="grid sm:grid-cols-2 gap-4">
             {(achievements as any[]).map((a) => (
-              <div key={a.id} className="p-4 rounded-lg border border-border bg-card hover:border-primary/40 transition-colors">
-                <h3 className="font-semibold mb-1">{a.title}</h3>
+              <div key={a.id} className="relative group p-4 rounded-lg border border-border bg-card hover:border-primary/40 transition-colors">
+                <h3 className="font-semibold mb-1 pr-16">{a.title}</h3>
                 {a.date && <p className="text-xs text-muted-foreground font-mono mb-2">📅 {a.date}</p>}
                 {a.description && <p className="text-sm text-muted-foreground">{a.description}</p>}
+                {isAdmin && (
+                  <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <InlineEdit
+                      table="achievements"
+                      rowId={a.id}
+                      row={a}
+                      invalidateKeys={["achievements"]}
+                      label="Edit achievement"
+                      fields={[
+                        { key: "title", label: "Title" },
+                        { key: "description", label: "Description", type: "textarea" },
+                        { key: "date", label: "Date" },
+                      ]}
+                    />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7"
+                      onClick={() => removeRow("achievements", a.id, "achievements")}
+                      aria-label="Delete"
+                    >
+                      <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                    </Button>
+                  </div>
+                )}
               </div>
             ))}
           </div>

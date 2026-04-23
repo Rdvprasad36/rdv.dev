@@ -480,11 +480,27 @@ export default function Overview() {
       </div>
 
       {/* EDUCATION */}
-      {education.length > 0 && (
+      {(education.length > 0 || isAdmin) && (
         <Card className="p-6 md:p-8">
           <div className="flex items-center gap-2 mb-6">
             <GraduationCap className="h-5 w-5 text-primary" />
             <h2 className="text-xl font-bold">Education</h2>
+            {isAdmin && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="ml-auto"
+                onClick={() =>
+                  addRow(
+                    "education",
+                    { institution: "New school", degree: "", field: "", duration: "", sort_order: 999 },
+                    "education"
+                  )
+                }
+              >
+                <Plus className="h-3.5 w-3.5 mr-1.5" /> Add
+              </Button>
+            )}
           </div>
           <div className="space-y-4">
             {(education as any[]).map((ed, i) => (
@@ -494,7 +510,7 @@ export default function Overview() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: i * 0.05 }}
-                className="relative pl-7 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-px before:bg-border"
+                className="relative pl-7 group before:absolute before:left-2 before:top-2 before:bottom-2 before:w-px before:bg-border"
               >
                 <span className="absolute left-1 top-1.5 h-3 w-3 rounded-full bg-primary ring-4 ring-background" />
                 <div className="flex flex-wrap items-baseline justify-between gap-2 mb-1">
@@ -503,6 +519,33 @@ export default function Overview() {
                 </div>
                 <p className="text-sm text-primary font-medium">{ed.degree} {ed.field && `· ${ed.field}`}</p>
                 {ed.description && <p className="text-sm text-muted-foreground mt-1.5">{ed.description}</p>}
+                {isAdmin && (
+                  <div className="absolute top-0 right-0 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <InlineEdit
+                      table="education"
+                      rowId={ed.id}
+                      row={ed}
+                      invalidateKeys={["education"]}
+                      label="Edit education"
+                      fields={[
+                        { key: "institution", label: "Institution" },
+                        { key: "degree", label: "Degree" },
+                        { key: "field", label: "Field" },
+                        { key: "duration", label: "Duration" },
+                        { key: "description", label: "Description", type: "textarea" },
+                      ]}
+                    />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7"
+                      onClick={() => removeRow("education", ed.id, "education")}
+                      aria-label="Delete"
+                    >
+                      <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                    </Button>
+                  </div>
+                )}
               </motion.div>
             ))}
           </div>
@@ -510,18 +553,59 @@ export default function Overview() {
       )}
 
       {/* ACHIEVEMENTS */}
-      {achievements.length > 0 && (
+      {(achievements.length > 0 || isAdmin) && (
         <Card className="p-6 md:p-8">
           <div className="flex items-center gap-2 mb-6">
             <Award className="h-5 w-5 text-primary" />
             <h2 className="text-xl font-bold">Achievements</h2>
+            {isAdmin && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="ml-auto"
+                onClick={() =>
+                  addRow(
+                    "achievements",
+                    { title: "New achievement", description: "", date: "", sort_order: 999 },
+                    "achievements"
+                  )
+                }
+              >
+                <Plus className="h-3.5 w-3.5 mr-1.5" /> Add
+              </Button>
+            )}
           </div>
           <div className="grid sm:grid-cols-2 gap-4">
             {(achievements as any[]).map((a) => (
-              <div key={a.id} className="p-4 rounded-lg border border-border bg-card hover:border-primary/40 transition-colors">
-                <h3 className="font-semibold mb-1">{a.title}</h3>
+              <div key={a.id} className="relative group p-4 rounded-lg border border-border bg-card hover:border-primary/40 transition-colors">
+                <h3 className="font-semibold mb-1 pr-16">{a.title}</h3>
                 {a.date && <p className="text-xs text-muted-foreground font-mono mb-2">📅 {a.date}</p>}
                 {a.description && <p className="text-sm text-muted-foreground">{a.description}</p>}
+                {isAdmin && (
+                  <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <InlineEdit
+                      table="achievements"
+                      rowId={a.id}
+                      row={a}
+                      invalidateKeys={["achievements"]}
+                      label="Edit achievement"
+                      fields={[
+                        { key: "title", label: "Title" },
+                        { key: "description", label: "Description", type: "textarea" },
+                        { key: "date", label: "Date" },
+                      ]}
+                    />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7"
+                      onClick={() => removeRow("achievements", a.id, "achievements")}
+                      aria-label="Delete"
+                    >
+                      <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                    </Button>
+                  </div>
+                )}
               </div>
             ))}
           </div>

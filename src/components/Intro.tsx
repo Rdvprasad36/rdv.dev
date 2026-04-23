@@ -10,7 +10,7 @@ export function Intro() {
     const t = setTimeout(() => {
       setShow(false);
       sessionStorage.setItem("rdv-intro-seen", "1");
-    }, 2500);
+    }, 3000);
     return () => clearTimeout(t);
   }, [show]);
 

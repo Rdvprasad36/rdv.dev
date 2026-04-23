@@ -1,5 +1,17 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { Moon, Sun, LogIn, LogOut, Menu, X } from "lucide-react";
+import {
+  Moon,
+  Sun,
+  LogIn,
+  LogOut,
+  Menu,
+  X,
+  User,
+  BarChart3,
+  Github,
+  BookOpen,
+  Mail,
+} from "lucide-react";
 import { useState } from "react";
 import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/hooks/useAuth";
@@ -9,11 +21,11 @@ import logoBlack from "@/assets/logo-black.png";
 import { cn } from "@/lib/utils";
 
 const links = [
-  { to: "/", label: "Overview", end: true },
-  { to: "/stats", label: "Stats" },
-  { to: "/projects", label: "Projects" },
-  { to: "/blog", label: "Blog" },
-  { to: "/contact", label: "Contact" },
+  { to: "/", label: "Overview", end: true, icon: User },
+  { to: "/stats", label: "Stats", icon: BarChart3 },
+  { to: "/projects", label: "Projects", icon: Github },
+  { to: "/blog", label: "Blog", icon: BookOpen },
+  { to: "/contact", label: "Contact", icon: Mail },
 ];
 
 export function Navbar() {

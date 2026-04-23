@@ -3,7 +3,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Download,
@@ -21,9 +21,14 @@ import {
   Layers,
   Palette,
   Monitor,
+  Plus,
+  Trash2,
 } from "lucide-react";
 import profileDefault from "@/assets/profile-default.jpg";
 import { motion } from "framer-motion";
+import { InlineEdit } from "@/components/admin/InlineEdit";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   Layers,
@@ -40,6 +45,41 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
 
 export default function Overview() {
   const { data: profile, isLoading } = useProfile();
+  const { isAdmin } = useAuth();
+  const queryClient = useQueryClient();
+
+  async function addOverviewSection() {
+    const { error } = await supabase
+      .from("overview_sections")
+      .insert({ title: "New section", description: "", icon: "Layers", sort_order: 999 });
+    if (error) return toast.error(error.message);
+    toast.success("Card added");
+    queryClient.invalidateQueries({ queryKey: ["overview_sections"] });
+  }
+
+  async function removeOverviewSection(id: string) {
+    if (!confirm("Delete this card?")) return;
+    const { error } = await supabase.from("overview_sections").delete().eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success("Deleted");
+    queryClient.invalidateQueries({ queryKey: ["overview_sections"] });
+  }
+
+  async function removeRow(table: string, id: string, queryKey: string) {
+    if (!confirm("Delete this entry?")) return;
+    const { error } = await (supabase.from(table as any) as any).delete().eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success("Deleted");
+    queryClient.invalidateQueries({ queryKey: [queryKey] });
+  }
+
+  async function addRow(table: string, payload: any, queryKey: string) {
+    const { error } = await (supabase.from(table as any) as any).insert(payload);
+    if (error) return toast.error(error.message);
+    toast.success("Added");
+    queryClient.invalidateQueries({ queryKey: [queryKey] });
+  }
+
 
   const { data: experience = [] } = useQuery({
     queryKey: ["experience"],

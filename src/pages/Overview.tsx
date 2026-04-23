@@ -280,6 +280,19 @@ export default function Overview() {
             <div className="flex items-center gap-2 mb-4">
               <FileText className="h-5 w-5 text-primary" />
               <h2 className="text-xl font-bold">About Me</h2>
+              {isAdmin && (
+                <div className="ml-auto">
+                  <InlineEdit
+                    table="profiles"
+                    rowId={profile?.id ?? null}
+                    row={profile ?? {}}
+                    invalidateKeys={["profile"]}
+                    size="sm"
+                    label="Edit bio"
+                    fields={[{ key: "bio", label: "Bio", type: "textarea" }]}
+                  />
+                </div>
+              )}
             </div>
             {profile?.bio && (
               <p className="text-sm md:text-base text-muted-foreground leading-relaxed mb-6">
@@ -287,7 +300,7 @@ export default function Overview() {
               </p>
             )}
 
-            {overviewSections.length > 0 && (
+            {(overviewSections.length > 0 || isAdmin) && (
               <div className="grid md:grid-cols-2 gap-5 pt-2 border-t border-border/40">
                 {(overviewSections as any[]).map((sec, i) => {
                   const Icon = ICON_MAP[sec.icon || ""] || Layers;
@@ -298,20 +311,53 @@ export default function Overview() {
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
                       transition={{ duration: 0.4, delay: i * 0.08 }}
-                      className="flex gap-3 pt-5"
+                      className="relative flex gap-3 pt-5 group"
                     >
                       <div className="shrink-0 p-2.5 rounded-lg bg-primary/10 h-fit">
                         <Icon className="h-5 w-5 text-primary" />
                       </div>
-                      <div>
+                      <div className="flex-1">
                         <h3 className="font-semibold mb-1">{sec.title}</h3>
                         {sec.description && (
                           <p className="text-sm text-muted-foreground leading-relaxed">{sec.description}</p>
                         )}
                       </div>
+                      {isAdmin && (
+                        <div className="absolute top-4 right-0 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <InlineEdit
+                            table="overview_sections"
+                            rowId={sec.id}
+                            row={sec}
+                            invalidateKeys={["overview_sections"]}
+                            label="Edit card"
+                            fields={[
+                              { key: "title", label: "Title" },
+                              { key: "description", label: "Description", type: "textarea" },
+                              { key: "icon", label: "Icon (Layers, Palette, Monitor, Github, Code2, Award, Briefcase, GraduationCap, Globe, FileText)" },
+                            ]}
+                          />
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7"
+                            onClick={() => removeOverviewSection(sec.id)}
+                            aria-label="Delete card"
+                          >
+                            <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                          </Button>
+                        </div>
+                      )}
                     </motion.div>
                   );
                 })}
+                {isAdmin && (
+                  <button
+                    onClick={addOverviewSection}
+                    className="pt-5 flex items-center justify-center gap-2 text-sm text-muted-foreground border-2 border-dashed border-border rounded-lg p-6 hover:border-primary/50 hover:text-primary transition-colors"
+                  >
+                    <Plus className="h-4 w-4" /> Add highlight card
+                  </button>
+                )}
               </div>
             )}
 

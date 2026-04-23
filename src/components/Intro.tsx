@@ -1,11 +1,8 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
-import { useTheme } from "@/hooks/useTheme";
 import logoWhite from "@/assets/logo-white.png";
-import logoBlack from "@/assets/logo-black.png";
 
 export function Intro() {
-  const { theme } = useTheme();
   const [show, setShow] = useState(() => !sessionStorage.getItem("rdv-intro-seen"));
 
   useEffect(() => {
@@ -13,7 +10,7 @@ export function Intro() {
     const t = setTimeout(() => {
       setShow(false);
       sessionStorage.setItem("rdv-intro-seen", "1");
-    }, 2200);
+    }, 2500);
     return () => clearTimeout(t);
   }, [show]);
 
@@ -21,42 +18,57 @@ export function Intro() {
     <AnimatePresence>
       {show && (
         <motion.div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-background"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black"
           initial={{ opacity: 1 }}
-          exit={{ opacity: 0, transition: { duration: 0.5 } }}
+          exit={{ opacity: 0, transition: { duration: 0.6 } }}
         >
-          <div className="absolute inset-0 bg-gradient-glow opacity-60" />
+          {/* radial glow accents */}
+          <div className="pointer-events-none absolute inset-0 opacity-40">
+            <div className="absolute top-1/4 left-1/3 h-96 w-96 rounded-full bg-primary/30 blur-[120px]" />
+            <div className="absolute bottom-1/4 right-1/3 h-96 w-96 rounded-full bg-blue-500/20 blur-[120px]" />
+          </div>
+
           <motion.div
             className="relative flex flex-col items-center gap-6"
             initial={{ scale: 0.6, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
           >
-            <motion.img
-              src={theme === "dark" ? logoWhite : logoBlack}
-              alt="RDV.Dev logo"
-              className="h-24 w-24 object-contain drop-shadow-glow"
-              initial={{ rotate: -20, scale: 0.5 }}
+            {/* circular logo with glowing ring */}
+            <motion.div
+              className="relative"
+              initial={{ rotate: -15, scale: 0.5 }}
               animate={{ rotate: 0, scale: 1 }}
               transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-            />
+            >
+              <div className="absolute -inset-3 rounded-full bg-gradient-primary opacity-60 blur-2xl animate-pulse" />
+              <div className="relative h-32 w-32 rounded-full overflow-hidden ring-4 ring-white/10 bg-white/5 backdrop-blur-sm flex items-center justify-center">
+                <img
+                  src={logoWhite}
+                  alt="RDV logo"
+                  className="h-20 w-20 object-contain"
+                />
+              </div>
+            </motion.div>
+
             <div className="overflow-hidden">
               <motion.h1
-                className="text-5xl md:text-6xl font-bold tracking-tight gradient-text"
-                initial={{ y: 60, opacity: 0 }}
+                className="text-5xl md:text-7xl font-bold tracking-tight text-white"
+                initial={{ y: 80, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.4, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ delay: 0.4, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
               >
-                RDV.Dev
+                R D V <span className="gradient-text">Prasad</span>
               </motion.h1>
             </div>
+
             <motion.p
-              className="text-sm uppercase tracking-[0.3em] text-muted-foreground"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              className="text-sm uppercase tracking-[0.4em] text-white/60"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.9, duration: 0.6 }}
             >
-              The Living Portfolio
+              Portfolio
             </motion.p>
           </motion.div>
         </motion.div>

@@ -4,7 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Heart, Pencil, Plus, Trash2 } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Heart, Pencil, Plus, Trash2, MessageSquare, BookOpen } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
@@ -13,7 +14,7 @@ import { PostFormDialog } from "@/components/admin/PostFormDialog";
 import { toast } from "sonner";
 import { getVisitorId } from "@/lib/visitorId";
 import profileDefault from "@/assets/profile-default.jpg";
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow, format } from "date-fns";
 
 export default function Blog() {
   const { isAdmin } = useAuth();
@@ -48,7 +49,6 @@ export default function Blog() {
 
   async function toggleLike(postId: string) {
     const liked = likedIds.has(postId);
-    // Optimistic
     setLikedIds((prev) => {
       const next = new Set(prev);
       liked ? next.delete(postId) : next.add(postId);
@@ -72,78 +72,107 @@ export default function Blog() {
     queryClient.invalidateQueries({ queryKey: ["posts"] });
   }
 
+  function postDate(p: any) {
+    return p.post_date || p.created_at;
+  }
+
   return (
-    <Section eyebrow="Updates" title="Blog" description="Short-form notes, project updates and learnings.">
-      {isAdmin && (
-        <div className="mb-6">
-          <Button onClick={() => { setEditing(null); setOpen(true); }}>
-            <Plus className="h-4 w-4 mr-2" /> New post
-          </Button>
-        </div>
-      )}
+    <Section eyebrow="Updates" title="Blog & Posts" description="Long-form articles and short updates from my journey.">
+      <Tabs defaultValue="posts">
+        <TabsList>
+          <TabsTrigger value="posts"><MessageSquare className="h-3.5 w-3.5 mr-1.5" /> Posts</TabsTrigger>
+          <TabsTrigger value="blogs"><BookOpen className="h-3.5 w-3.5 mr-1.5" /> Blogs</TabsTrigger>
+        </TabsList>
 
-      <div className="max-w-2xl mx-auto space-y-5">
-        {isLoading && [...Array(3)].map((_, i) => <Skeleton key={i} className="h-48" />)}
+        {/* POSTS - mini LinkedIn masonry grid (2-3 cols, side by side) */}
+        <TabsContent value="posts" className="mt-6">
+          {isAdmin && (
+            <div className="mb-6">
+              <Button onClick={() => { setEditing(null); setOpen(true); }}>
+                <Plus className="h-4 w-4 mr-2" /> New post
+              </Button>
+            </div>
+          )}
 
-        {!isLoading && posts.length === 0 && (
-          <Card className="p-12 text-center">
-            <p className="text-muted-foreground">No posts yet. {isAdmin && "Click 'New post' to share an update."}</p>
-          </Card>
-        )}
+          {isLoading && (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-64" />)}
+            </div>
+          )}
 
-        {posts.map((p: any, i: number) => (
-          <motion.div
-            key={p.id}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: i * 0.05 }}
-          >
-            <Card className="overflow-hidden">
-              <div className="p-5">
-                <div className="flex items-center gap-3 mb-3">
-                  <img
-                    src={profile?.profile_pic_url || profileDefault}
-                    alt={profile?.name}
-                    className="h-10 w-10 rounded-full object-cover"
-                  />
-                  <div className="flex-1">
-                    <p className="font-semibold text-sm">{profile?.name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {profile?.tagline} · {formatDistanceToNow(new Date(p.created_at), { addSuffix: true })}
-                    </p>
-                  </div>
-                  {isAdmin && (
-                    <div className="flex gap-1">
-                      <Button variant="ghost" size="icon" onClick={() => { setEditing(p); setOpen(true); }}>
-                        <Pencil className="h-3.5 w-3.5" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleDelete(p.id)}>
-                        <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                      </Button>
-                    </div>
-                  )}
-                </div>
-                <p className="whitespace-pre-wrap text-sm leading-relaxed mb-3">{p.content}</p>
-              </div>
-              {p.image_url && (
-                <img src={p.image_url} alt="Post" loading="lazy" className="w-full max-h-[500px] object-cover" />
-              )}
-              <div className="px-5 py-3 border-t border-border/40 flex items-center gap-3">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => toggleLike(p.id)}
-                  className={likedIds.has(p.id) ? "text-primary" : ""}
-                >
-                  <Heart className={`h-4 w-4 mr-1.5 ${likedIds.has(p.id) ? "fill-current" : ""}`} />
-                  {p.likes_count} {p.likes_count === 1 ? "like" : "likes"}
-                </Button>
-              </div>
+          {!isLoading && posts.length === 0 && (
+            <Card className="p-12 text-center">
+              <p className="text-muted-foreground">No posts yet. {isAdmin && "Click 'New post' to share an update."}</p>
             </Card>
-          </motion.div>
-        ))}
-      </div>
+          )}
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-min">
+            {(posts as any[]).map((p, i) => (
+              <motion.div
+                key={p.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: (i % 6) * 0.05 }}
+              >
+                <Card className="overflow-hidden h-full flex flex-col hover:shadow-lg hover:-translate-y-0.5 transition-all">
+                  <div className="p-4">
+                    <div className="flex items-center gap-2.5 mb-3">
+                      <img
+                        src={profile?.profile_pic_url || profileDefault}
+                        alt={profile?.name}
+                        className="h-9 w-9 rounded-full object-cover ring-2 ring-primary/20"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-sm truncate">{profile?.name}</p>
+                        <p className="text-[11px] text-muted-foreground truncate">
+                          {format(new Date(postDate(p)), "MMM d, yyyy")} · {formatDistanceToNow(new Date(postDate(p)), { addSuffix: true })}
+                        </p>
+                      </div>
+                      {isAdmin && (
+                        <div className="flex gap-0.5">
+                          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setEditing(p); setOpen(true); }}>
+                            <Pencil className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleDelete(p.id)}>
+                            <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                    <p className="whitespace-pre-wrap text-sm leading-relaxed line-clamp-6">{p.content}</p>
+                  </div>
+                  {p.image_url && (
+                    <img src={p.image_url} alt="Post" loading="lazy" className="w-full max-h-64 object-cover" />
+                  )}
+                  <div className="mt-auto px-4 py-2 border-t border-border/40">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => toggleLike(p.id)}
+                      className={`h-8 ${likedIds.has(p.id) ? "text-primary" : ""}`}
+                    >
+                      <Heart className={`h-4 w-4 mr-1.5 ${likedIds.has(p.id) ? "fill-current" : ""}`} />
+                      {p.likes_count} {p.likes_count === 1 ? "like" : "likes"}
+                    </Button>
+                  </div>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </TabsContent>
+
+        {/* BLOGS - placeholder section */}
+        <TabsContent value="blogs" className="mt-6">
+          <Card className="p-12 text-center">
+            <BookOpen className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
+            <h3 className="font-semibold mb-2">Long-form blogs coming soon</h3>
+            <p className="text-sm text-muted-foreground max-w-md mx-auto">
+              Detailed write-ups, tutorials and deep dives will land here. For quick updates, check out the Posts tab.
+            </p>
+          </Card>
+        </TabsContent>
+      </Tabs>
 
       <PostFormDialog open={open} onOpenChange={setOpen} post={editing} />
     </Section>

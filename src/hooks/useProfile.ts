@@ -7,6 +7,7 @@ export type Profile = {
   tagline: string | null;
   bio: string | null;
   email: string | null;
+  phone: string | null;
   location: string | null;
   profile_pic_url: string | null;
   resume_url: string | null;

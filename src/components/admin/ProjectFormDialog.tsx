@@ -29,6 +29,8 @@ export function ProjectFormDialog({
     tech_stack: "",
     timeline: "",
     featured: false,
+    is_deployed: false,
+    deploy_url: "",
     sort_order: 0,
   });
   const [saving, setSaving] = useState(false);
@@ -40,7 +42,7 @@ export function ProjectFormDialog({
         tech_stack: (project.tech_stack ?? []).join(", "),
       });
     } else {
-      setForm({ title: "", description: "", image_url: "", repo_url: "", live_url: "", tech_stack: "", timeline: "", featured: false, sort_order: 0 });
+      setForm({ title: "", description: "", image_url: "", repo_url: "", live_url: "", tech_stack: "", timeline: "", featured: false, is_deployed: false, deploy_url: "", sort_order: 0 });
     }
   }, [project, open]);
 
@@ -61,6 +63,8 @@ export function ProjectFormDialog({
         : [],
       timeline: form.timeline || null,
       featured: !!form.featured,
+      is_deployed: !!form.is_deployed,
+      deploy_url: form.deploy_url || null,
       sort_order: Number(form.sort_order) || 0,
     };
     const { error } = project
@@ -112,10 +116,28 @@ export function ProjectFormDialog({
               <Input value={form.timeline ?? ""} onChange={(e) => setForm({ ...form, timeline: e.target.value })} placeholder="2024" />
             </div>
             <div>
-              <Label>Sort order</Label>
+              <Label>Display order <span className="text-xs text-muted-foreground">(lower = first)</span></Label>
               <Input type="number" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: e.target.value })} />
             </div>
           </div>
+
+          <div className="rounded-lg border border-border p-3 space-y-3">
+            <div className="flex items-center gap-3">
+              <Switch checked={form.is_deployed} onCheckedChange={(v) => setForm({ ...form, is_deployed: v })} />
+              <Label>Deployed / Live status</Label>
+            </div>
+            {form.is_deployed && (
+              <div>
+                <Label>Deploy URL</Label>
+                <Input
+                  value={form.deploy_url ?? ""}
+                  onChange={(e) => setForm({ ...form, deploy_url: e.target.value })}
+                  placeholder="https://yourapp.vercel.app"
+                />
+              </div>
+            )}
+          </div>
+
           <div className="flex items-center gap-3">
             <Switch checked={form.featured} onCheckedChange={(v) => setForm({ ...form, featured: v })} />
             <Label>Featured project</Label>

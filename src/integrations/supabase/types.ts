@@ -146,6 +146,36 @@ export type Database = {
         }
         Relationships: []
       }
+      overview_sections: {
+        Row: {
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       post_likes: {
         Row: {
           created_at: string
@@ -182,6 +212,7 @@ export type Database = {
           id: string
           image_url: string | null
           likes_count: number
+          post_date: string | null
           updated_at: string
         }
         Insert: {
@@ -190,6 +221,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           likes_count?: number
+          post_date?: string | null
           updated_at?: string
         }
         Update: {
@@ -198,6 +230,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           likes_count?: number
+          post_date?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -216,6 +249,7 @@ export type Database = {
           linkedin_url: string | null
           location: string | null
           name: string
+          phone: string | null
           portfolio_url: string | null
           profile_pic_url: string | null
           resume_url: string | null
@@ -236,6 +270,7 @@ export type Database = {
           linkedin_url?: string | null
           location?: string | null
           name?: string
+          phone?: string | null
           portfolio_url?: string | null
           profile_pic_url?: string | null
           resume_url?: string | null
@@ -256,6 +291,7 @@ export type Database = {
           linkedin_url?: string | null
           location?: string | null
           name?: string
+          phone?: string | null
           portfolio_url?: string | null
           profile_pic_url?: string | null
           resume_url?: string | null
@@ -268,10 +304,12 @@ export type Database = {
       projects: {
         Row: {
           created_at: string
+          deploy_url: string | null
           description: string | null
           featured: boolean
           id: string
           image_url: string | null
+          is_deployed: boolean
           live_url: string | null
           repo_url: string | null
           sort_order: number
@@ -282,10 +320,12 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          deploy_url?: string | null
           description?: string | null
           featured?: boolean
           id?: string
           image_url?: string | null
+          is_deployed?: boolean
           live_url?: string | null
           repo_url?: string | null
           sort_order?: number
@@ -296,10 +336,12 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          deploy_url?: string | null
           description?: string | null
           featured?: boolean
           id?: string
           image_url?: string | null
+          is_deployed?: boolean
           live_url?: string | null
           repo_url?: string | null
           sort_order?: number

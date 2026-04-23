@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Github, Code2, Trophy, Activity } from "lucide-react";
+import { Github, Code2, Trophy, Activity, Flame } from "lucide-react";
 
 export default function Stats() {
   const { data: profile } = useProfile();
@@ -112,6 +112,45 @@ export default function Stats() {
           )}
         </Card>
       </div>
+
+      {/* GitHub Streak - full width */}
+      {profile?.github_username && (
+        <Card className="p-6 mt-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Flame className="h-5 w-5 text-orange-500" />
+            <h3 className="font-semibold">GitHub Streak</h3>
+            <span className="ml-auto text-xs text-muted-foreground">Live · @{profile.github_username}</span>
+          </div>
+          <div className="flex justify-center overflow-x-auto">
+            <img
+              src={`https://github-readme-streak-stats.herokuapp.com/?user=${encodeURIComponent(profile.github_username)}&theme=transparent&hide_border=true&background=00000000&ring=2563EB&fire=F97316&currStreakLabel=2563EB`}
+              alt={`GitHub streak for ${profile.github_username}`}
+              loading="lazy"
+              className="max-w-full h-auto"
+            />
+          </div>
+          <div className="mt-5 grid sm:grid-cols-2 gap-4">
+            <div>
+              <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-2">Top languages</p>
+              <img
+                src={`https://github-readme-stats.vercel.app/api/top-langs/?username=${encodeURIComponent(profile.github_username)}&layout=compact&theme=transparent&hide_border=true&bg_color=00000000&title_color=2563EB&text_color=888`}
+                alt="Top languages"
+                loading="lazy"
+                className="w-full"
+              />
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-2">Stats card</p>
+              <img
+                src={`https://github-readme-stats.vercel.app/api?username=${encodeURIComponent(profile.github_username)}&show_icons=true&theme=transparent&hide_border=true&bg_color=00000000&title_color=2563EB&icon_color=2563EB&text_color=888`}
+                alt="GitHub stats card"
+                loading="lazy"
+                className="w-full"
+              />
+            </div>
+          </div>
+        </Card>
+      )}
     </Section>
   );
 }

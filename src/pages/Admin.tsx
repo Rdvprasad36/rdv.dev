@@ -45,6 +45,7 @@ export default function Admin() {
       tagline: form.tagline,
       bio: form.bio,
       email: form.email,
+      phone: form.phone,
       location: form.location,
       profile_pic_url: form.profile_pic_url,
       resume_url: form.resume_url,
@@ -72,6 +73,7 @@ export default function Admin() {
       <Tabs defaultValue="profile">
         <TabsList className="flex-wrap h-auto">
           <TabsTrigger value="profile">Profile</TabsTrigger>
+          <TabsTrigger value="overview">Overview Sections</TabsTrigger>
           <TabsTrigger value="experience">Experience</TabsTrigger>
           <TabsTrigger value="education">Education</TabsTrigger>
           <TabsTrigger value="skills">Skills</TabsTrigger>
@@ -100,6 +102,12 @@ export default function Admin() {
                 <Label>Email</Label>
                 <Input type="email" value={form.email ?? ""} onChange={(e) => setForm({ ...form, email: e.target.value })} />
               </div>
+              <div>
+                <Label>Phone</Label>
+                <Input value={form.phone ?? ""} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="7382612327" />
+              </div>
+            </div>
+            <div className="grid sm:grid-cols-1 gap-4">
               <div>
                 <Label>Location</Label>
                 <Input value={form.location ?? ""} onChange={(e) => setForm({ ...form, location: e.target.value })} />
@@ -155,6 +163,20 @@ export default function Admin() {
             </div>
             <Button onClick={saveProfile} disabled={saving}>{saving ? "Saving…" : "Save profile"}</Button>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="overview" className="mt-6">
+          <SimpleListEditor
+            table="overview_sections"
+            queryKey="overview_sections"
+            fields={[
+              { key: "title", label: "Card title" },
+              { key: "description", label: "Description", textarea: true },
+              { key: "icon", label: "Icon (Layers, Palette, Monitor, Github, Code2, Award, Briefcase, GraduationCap, Globe, FileText)" },
+              { key: "sort_order", label: "Sort", type: "number" },
+            ]}
+            requiredFields={["title"]}
+          />
         </TabsContent>
 
         <TabsContent value="experience" className="mt-6">

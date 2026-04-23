@@ -10,9 +10,9 @@ import { cn } from "@/lib/utils";
 
 const links = [
   { to: "/", label: "Overview", end: true },
+  { to: "/stats", label: "Stats" },
   { to: "/projects", label: "Projects" },
   { to: "/blog", label: "Blog" },
-  { to: "/stats", label: "Stats" },
   { to: "/contact", label: "Contact" },
 ];
 
@@ -26,11 +26,13 @@ export function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b border-border/40 glass">
       <nav className="container flex h-16 items-center justify-between gap-4">
         <Link to="/" className="flex items-center gap-2 font-bold text-lg">
-          <img
-            src={theme === "dark" ? logoWhite : logoBlack}
-            alt="RDV"
-            className="h-8 w-8 object-contain"
-          />
+          <div className="h-9 w-9 rounded-full overflow-hidden ring-2 ring-primary/30 bg-secondary flex items-center justify-center">
+            <img
+              src={theme === "dark" ? logoWhite : logoBlack}
+              alt="RDV"
+              className="h-6 w-6 object-contain"
+            />
+          </div>
           <span className="hidden sm:inline gradient-text">RDV.Dev</span>
         </Link>
 

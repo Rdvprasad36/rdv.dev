@@ -1,6 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,11 +21,21 @@ export function PostFormDialog({
   const queryClient = useQueryClient();
   const [content, setContent] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [postDate, setPostDate] = useState("");
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     setContent(post?.content ?? "");
     setImageUrl(post?.image_url ?? "");
+    // datetime-local needs YYYY-MM-DDTHH:mm
+    const d = post?.post_date ?? post?.created_at;
+    if (d) {
+      const dt = new Date(d);
+      const tzOffset = dt.getTimezoneOffset() * 60000;
+      setPostDate(new Date(dt.getTime() - tzOffset).toISOString().slice(0, 16));
+    } else {
+      setPostDate("");
+    }
   }, [post, open]);
 
   async function save() {
@@ -33,7 +44,11 @@ export function PostFormDialog({
       return;
     }
     setSaving(true);
-    const payload = { content: content.trim(), image_url: imageUrl || null };
+    const payload: any = {
+      content: content.trim(),
+      image_url: imageUrl || null,
+      post_date: postDate ? new Date(postDate).toISOString() : null,
+    };
     const { error } = post
       ? await supabase.from("posts").update(payload).eq("id", post.id)
       : await supabase.from("posts").insert(payload);
@@ -58,6 +73,10 @@ export function PostFormDialog({
           <div>
             <Label>Image (optional)</Label>
             <ImageUpload bucket="posts" value={imageUrl} onChange={setImageUrl} />
+          </div>
+          <div>
+            <Label>Post date <span className="text-xs text-muted-foreground">(optional override)</span></Label>
+            <Input type="datetime-local" value={postDate} onChange={(e) => setPostDate(e.target.value)} />
           </div>
         </div>
         <DialogFooter>

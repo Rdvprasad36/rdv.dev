@@ -38,34 +38,38 @@ export function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b border-border/40 glass">
       <nav className="container flex h-16 items-center justify-between gap-4">
         <Link to="/" className="flex items-center gap-2 font-bold text-lg">
-          <div className="h-9 w-9 rounded-full overflow-hidden ring-2 ring-primary/30 bg-secondary flex items-center justify-center">
+          <div className="h-10 w-10 rounded-full overflow-hidden ring-2 ring-primary/40 bg-secondary flex items-center justify-center shadow-sm">
             <img
               src={theme === "dark" ? logoWhite : logoBlack}
               alt="RDV"
-              className="h-6 w-6 object-contain"
+              className="h-9 w-9 object-cover rounded-full scale-110"
             />
           </div>
           <span className="hidden sm:inline gradient-text">RDV.Dev</span>
         </Link>
 
         <div className="hidden md:flex items-center gap-1">
-          {links.map((l) => (
-            <NavLink
-              key={l.to}
-              to={l.to}
-              end={l.end}
-              className={({ isActive }) =>
-                cn(
-                  "px-3 py-2 text-sm font-medium rounded-md transition-colors",
-                  isActive
-                    ? "text-primary bg-accent"
-                    : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-                )
-              }
-            >
-              {l.label}
-            </NavLink>
-          ))}
+          {links.map((l) => {
+            const Icon = l.icon;
+            return (
+              <NavLink
+                key={l.to}
+                to={l.to}
+                end={l.end}
+                className={({ isActive }) =>
+                  cn(
+                    "px-3 py-2 text-sm font-medium rounded-md transition-colors inline-flex items-center gap-1.5",
+                    isActive
+                      ? "text-primary bg-accent"
+                      : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                  )
+                }
+              >
+                <Icon className="h-4 w-4" />
+                {l.label}
+              </NavLink>
+            );
+          })}
         </div>
 
         <div className="flex items-center gap-2">
@@ -107,24 +111,28 @@ export function Navbar() {
       {open && (
         <div className="md:hidden border-t border-border/40 glass">
           <div className="container flex flex-col gap-1 py-3">
-            {links.map((l) => (
-              <NavLink
-                key={l.to}
-                to={l.to}
-                end={l.end}
-                onClick={() => setOpen(false)}
-                className={({ isActive }) =>
-                  cn(
-                    "px-3 py-2 text-sm font-medium rounded-md",
-                    isActive
-                      ? "text-primary bg-accent"
-                      : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-                  )
-                }
-              >
-                {l.label}
-              </NavLink>
-            ))}
+            {links.map((l) => {
+              const Icon = l.icon;
+              return (
+                <NavLink
+                  key={l.to}
+                  to={l.to}
+                  end={l.end}
+                  onClick={() => setOpen(false)}
+                  className={({ isActive }) =>
+                    cn(
+                      "px-3 py-2 text-sm font-medium rounded-md inline-flex items-center gap-2",
+                      isActive
+                        ? "text-primary bg-accent"
+                        : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                    )
+                  }
+                >
+                  <Icon className="h-4 w-4" />
+                  {l.label}
+                </NavLink>
+              );
+            })}
           </div>
         </div>
       )}

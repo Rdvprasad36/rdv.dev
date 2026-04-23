@@ -145,6 +145,32 @@ export default function Overview() {
           <div className="absolute inset-0 bg-gradient-hero opacity-50" />
           <div className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-primary/20 blur-3xl" />
 
+          {isAdmin && (
+            <div className="absolute top-3 right-3 z-10 flex gap-2">
+              <InlineEdit
+                table="profiles"
+                rowId={profile?.id ?? null}
+                row={profile ?? {}}
+                invalidateKeys={["profile"]}
+                size="sm"
+                label="Edit profile"
+                fields={[
+                  { key: "name", label: "Name" },
+                  { key: "tagline", label: "Tagline" },
+                  { key: "phone", label: "Phone", placeholder: "7382612327" },
+                  { key: "email", label: "Email" },
+                  { key: "location", label: "Location" },
+                  { key: "portfolio_url", label: "Portfolio URL", type: "url" },
+                  { key: "linkedin_url", label: "LinkedIn URL", type: "url" },
+                  { key: "github_url", label: "GitHub URL", type: "url" },
+                  { key: "codechef_url", label: "CodeChef URL", type: "url" },
+                  { key: "profile_pic_url", label: "Profile photo", type: "image" },
+                  { key: "resume_url", label: "Resume PDF", type: "resume" },
+                  { key: "is_available", label: "Available for work", type: "switch" },
+                ]}
+              />
+            </div>
+          )}
           <div className="relative grid md:grid-cols-[auto,1fr] gap-6 md:gap-10 items-center">
             <div className="relative mx-auto md:mx-0">
               <div className="absolute -inset-3 bg-gradient-primary rounded-full opacity-40 blur-xl" />

@@ -8,7 +8,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Github, Linkedin, Twitter, Mail, MapPin, Send, Code2, Globe } from "lucide-react";
+import { Github, Linkedin, Twitter, Mail, MapPin, Phone, Send, Code2, Globe } from "lucide-react";
 import { z } from "zod";
 
 const schema = z.object({
@@ -53,6 +53,12 @@ export default function Contact() {
             <a href={`mailto:${profile.email}`} className="flex items-center gap-3 p-3 rounded-lg hover:bg-secondary transition-colors">
               <Mail className="h-4 w-4 text-primary" />
               <span className="text-sm">{profile.email}</span>
+            </a>
+          )}
+          {profile?.phone && (
+            <a href={`tel:${profile.phone}`} className="flex items-center gap-3 p-3 rounded-lg hover:bg-secondary transition-colors">
+              <Phone className="h-4 w-4 text-primary" />
+              <span className="text-sm">+91 {profile.phone}</span>
             </a>
           )}
           {profile?.location && (

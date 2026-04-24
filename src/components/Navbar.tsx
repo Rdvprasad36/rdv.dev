@@ -38,11 +38,11 @@ export function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b border-border/40 glass">
       <nav className="container flex h-16 items-center justify-between gap-4">
         <Link to="/" className="flex items-center gap-2 font-bold text-lg">
-          <div className="h-10 w-10 rounded-full overflow-hidden ring-2 ring-primary/40 bg-secondary flex items-center justify-center shadow-sm">
+          <div className="h-10 w-10 rounded-full overflow-hidden ring-2 ring-primary/40 bg-background flex items-center justify-center shadow-sm p-1.5">
             <img
               src={theme === "dark" ? logoWhite : logoBlack}
               alt="RDV"
-              className="h-9 w-9 object-cover rounded-full scale-110"
+              className="h-full w-full object-contain"
             />
           </div>
           <span className="hidden sm:inline gradient-text">RDV.Dev</span>

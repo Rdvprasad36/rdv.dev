@@ -3,14 +3,11 @@ import { useEffect, useState } from "react";
 import logoWhite from "@/assets/logo-white.png";
 
 export function Intro() {
-  const [show, setShow] = useState(() => !sessionStorage.getItem("rdv-intro-seen"));
+  const [show, setShow] = useState(true);
 
   useEffect(() => {
     if (!show) return;
-    const t = setTimeout(() => {
-      setShow(false);
-      sessionStorage.setItem("rdv-intro-seen", "1");
-    }, 3000);
+    const t = setTimeout(() => setShow(false), 3000);
     return () => clearTimeout(t);
   }, [show]);
 
@@ -42,11 +39,11 @@ export function Intro() {
               transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
             >
               <div className="absolute -inset-3 rounded-full bg-gradient-primary opacity-60 blur-2xl animate-pulse" />
-              <div className="relative h-32 w-32 rounded-full overflow-hidden ring-4 ring-white/10 bg-white/5 backdrop-blur-sm flex items-center justify-center">
+              <div className="relative h-36 w-36 rounded-full overflow-hidden ring-4 ring-white/20 bg-white/5 backdrop-blur-sm flex items-center justify-center">
                 <img
                   src={logoWhite}
                   alt="RDV logo"
-                  className="h-20 w-20 object-contain"
+                  className="h-full w-full object-cover scale-110"
                 />
               </div>
             </motion.div>

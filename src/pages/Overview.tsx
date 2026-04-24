@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Link } from "react-router-dom";
 import {
   Download,
   MapPin,
@@ -173,11 +174,10 @@ export default function Overview() {
           )}
           <div className="relative grid md:grid-cols-[auto,1fr] gap-6 md:gap-10 items-center">
             <div className="relative mx-auto md:mx-0">
-              <div className="absolute -inset-3 bg-gradient-primary rounded-full opacity-40 blur-xl" />
               <img
                 src={profile?.profile_pic_url || profileDefault}
                 alt={profile?.name || "Profile"}
-                className="relative h-48 w-48 md:h-56 md:w-56 rounded-full object-cover border-4 border-background shadow-xl ring-2 ring-primary/30"
+                className="relative h-48 w-48 md:h-56 md:w-56 rounded-full object-cover border-4 border-background shadow-xl"
               />
               {profile?.is_available && (
                 <span className="absolute bottom-3 right-3 h-5 w-5 rounded-full bg-success border-4 border-background animate-pulse" />
@@ -251,9 +251,9 @@ export default function Overview() {
 
               <div className="flex flex-wrap gap-3 justify-center md:justify-start">
                 <Button asChild size="lg" variant="outline">
-                  <a href="/projects">
+                  <Link to="/projects">
                     <Briefcase className="h-4 w-4 mr-2" /> View All Projects
-                  </a>
+                  </Link>
                 </Button>
                 {profile?.resume_url && (
                   <Button asChild size="lg" className="bg-gradient-primary text-primary-foreground hover:opacity-90 shadow-md">
@@ -366,7 +366,7 @@ export default function Overview() {
                 <span className="text-muted-foreground">Ready to collaborate</span> on impactful projects and contribute to forward-thinking teams.
               </p>
               <Button asChild className="bg-gradient-primary text-primary-foreground hover:opacity-90">
-                <a href="/contact"><Mail className="h-4 w-4 mr-2" /> Contact Me</a>
+                <Link to="/contact"><Mail className="h-4 w-4 mr-2" /> Contact Me</Link>
               </Button>
             </div>
           </Card>

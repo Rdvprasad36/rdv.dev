@@ -85,6 +85,7 @@ export type Database = {
       }
       experience: {
         Row: {
+          category: string
           company: string
           created_at: string
           description: string | null
@@ -96,6 +97,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          category?: string
           company: string
           created_at?: string
           description?: string | null
@@ -107,6 +109,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          category?: string
           company?: string
           created_at?: string
           description?: string | null
@@ -143,6 +146,42 @@ export type Database = {
           is_read?: boolean
           message?: string
           name?: string
+        }
+        Relationships: []
+      }
+      logos: {
+        Row: {
+          client: string | null
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          sort_order: number
+          title: string
+          updated_at: string
+          year: string | null
+        }
+        Insert: {
+          client?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          sort_order?: number
+          title: string
+          updated_at?: string
+          year?: string | null
+        }
+        Update: {
+          client?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          sort_order?: number
+          title?: string
+          updated_at?: string
+          year?: string | null
         }
         Relationships: []
       }

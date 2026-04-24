@@ -16,15 +16,40 @@ Deno.serve(async (req) => {
       });
     }
 
-    const r = await fetch(`https://api.github.com/users/${encodeURIComponent(username)}`, {
-      headers: { "User-Agent": "rdv-dev-portfolio" },
-    });
+    const token = Deno.env.get("GITHUB_TOKEN");
+    const headers: Record<string, string> = {
+      "User-Agent": "rdv-dev-portfolio",
+      Accept: "application/vnd.github+json",
+    };
+    if (token) headers.Authorization = `Bearer ${token}`;
+
+    const r = await fetch(
+      `https://api.github.com/users/${encodeURIComponent(username)}`,
+      { headers }
+    );
+
     if (!r.ok) {
-      return new Response(JSON.stringify({ error: `GitHub ${r.status}` }), {
-        status: 502,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      const body = await r.text().catch(() => "");
+      console.error("GitHub API error", r.status, body.slice(0, 200));
+      // Graceful fallback so the frontend keeps rendering the rest of the page
+      return new Response(
+        JSON.stringify({
+          error:
+            r.status === 403
+              ? "GitHub API rate-limited. Add a GITHUB_TOKEN secret to lift the limit."
+              : `GitHub ${r.status}`,
+          fallback: true,
+          public_repos: null,
+          followers: null,
+          following: null,
+        }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
     }
+
     const data = await r.json();
     return new Response(
       JSON.stringify({
@@ -38,9 +63,13 @@ Deno.serve(async (req) => {
     );
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Unknown error";
-    return new Response(JSON.stringify({ error: msg }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    console.error("github-stats error", msg);
+    return new Response(
+      JSON.stringify({ error: msg, fallback: true }),
+      {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      }
+    );
   }
 });

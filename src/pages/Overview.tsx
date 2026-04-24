@@ -172,15 +172,50 @@ export default function Overview() {
             </div>
           )}
           <div className="relative grid md:grid-cols-[auto,1fr] gap-6 md:gap-10 items-center">
-            <div className="relative mx-auto md:mx-0">
-              <div className="absolute -inset-3 bg-gradient-primary rounded-full opacity-40 blur-xl" />
+            <div className="relative mx-auto md:mx-0 group">
               <img
                 src={profile?.profile_pic_url || profileDefault}
                 alt={profile?.name || "Profile"}
-                className="relative h-48 w-48 md:h-56 md:w-56 rounded-full object-cover border-4 border-background shadow-xl ring-2 ring-primary/30"
+                className="relative h-52 w-52 md:h-60 md:w-60 rounded-full object-cover border-4 border-background shadow-xl"
               />
+              {/* Availability pill (clickable for admin) */}
               {profile?.is_available && (
-                <span className="absolute bottom-3 right-3 h-5 w-5 rounded-full bg-success border-4 border-background animate-pulse" />
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (!isAdmin || !profile?.id) return;
+                    const { error } = await supabase
+                      .from("profiles")
+                      .update({ is_available: false })
+                      .eq("id", profile.id);
+                    if (error) return toast.error(error.message);
+                    queryClient.invalidateQueries({ queryKey: ["profile"] });
+                  }}
+                  className={`absolute -bottom-2 left-1/2 -translate-x-1/2 inline-flex items-center gap-1.5 text-[11px] font-medium px-3 py-1 rounded-full bg-success text-success-foreground shadow-lg whitespace-nowrap ${
+                    isAdmin ? "cursor-pointer hover:bg-success/90" : "cursor-default"
+                  }`}
+                  aria-label="Available for new opportunities"
+                  disabled={!isAdmin}
+                >
+                  <span className="h-1.5 w-1.5 rounded-full bg-current animate-pulse" />
+                  Available for new opportunities
+                </button>
+              )}
+              {!profile?.is_available && isAdmin && profile?.id && (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const { error } = await supabase
+                      .from("profiles")
+                      .update({ is_available: true })
+                      .eq("id", profile.id);
+                    if (error) return toast.error(error.message);
+                    queryClient.invalidateQueries({ queryKey: ["profile"] });
+                  }}
+                  className="absolute -bottom-2 left-1/2 -translate-x-1/2 inline-flex items-center gap-1.5 text-[11px] font-medium px-3 py-1 rounded-full bg-muted text-muted-foreground border border-border whitespace-nowrap hover:bg-accent"
+                >
+                  Mark available
+                </button>
               )}
             </div>
 

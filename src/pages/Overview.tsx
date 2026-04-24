@@ -172,50 +172,15 @@ export default function Overview() {
             </div>
           )}
           <div className="relative grid md:grid-cols-[auto,1fr] gap-6 md:gap-10 items-center">
-            <div className="relative mx-auto md:mx-0 group">
+            <div className="relative mx-auto md:mx-0">
+              <div className="absolute -inset-3 bg-gradient-primary rounded-full opacity-40 blur-xl" />
               <img
                 src={profile?.profile_pic_url || profileDefault}
                 alt={profile?.name || "Profile"}
-                className="relative h-52 w-52 md:h-60 md:w-60 rounded-full object-cover border-4 border-background shadow-xl"
+                className="relative h-48 w-48 md:h-56 md:w-56 rounded-full object-cover border-4 border-background shadow-xl ring-2 ring-primary/30"
               />
-              {/* Availability pill (clickable for admin) */}
               {profile?.is_available && (
-                <button
-                  type="button"
-                  onClick={async () => {
-                    if (!isAdmin || !profile?.id) return;
-                    const { error } = await supabase
-                      .from("profiles")
-                      .update({ is_available: false })
-                      .eq("id", profile.id);
-                    if (error) return toast.error(error.message);
-                    queryClient.invalidateQueries({ queryKey: ["profile"] });
-                  }}
-                  className={`absolute -bottom-2 left-1/2 -translate-x-1/2 inline-flex items-center gap-1.5 text-[11px] font-medium px-3 py-1 rounded-full bg-success text-success-foreground shadow-lg whitespace-nowrap ${
-                    isAdmin ? "cursor-pointer hover:bg-success/90" : "cursor-default"
-                  }`}
-                  aria-label="Available for new opportunities"
-                  disabled={!isAdmin}
-                >
-                  <span className="h-1.5 w-1.5 rounded-full bg-current animate-pulse" />
-                  Available for new opportunities
-                </button>
-              )}
-              {!profile?.is_available && isAdmin && profile?.id && (
-                <button
-                  type="button"
-                  onClick={async () => {
-                    const { error } = await supabase
-                      .from("profiles")
-                      .update({ is_available: true })
-                      .eq("id", profile.id);
-                    if (error) return toast.error(error.message);
-                    queryClient.invalidateQueries({ queryKey: ["profile"] });
-                  }}
-                  className="absolute -bottom-2 left-1/2 -translate-x-1/2 inline-flex items-center gap-1.5 text-[11px] font-medium px-3 py-1 rounded-full bg-muted text-muted-foreground border border-border whitespace-nowrap hover:bg-accent"
-                >
-                  Mark available
-                </button>
+                <span className="absolute bottom-3 right-3 h-5 w-5 rounded-full bg-success border-4 border-background animate-pulse" />
               )}
             </div>
 
@@ -408,91 +373,111 @@ export default function Overview() {
         </motion.div>
       )}
 
-      {/* EXPERIENCE & LEADERSHIP grouped */}
-      {(experience.length > 0 || isAdmin) && (
-        <Card className="p-6 md:p-8">
-          <div className="flex items-center gap-2 mb-6">
-            <Briefcase className="h-5 w-5 text-primary" />
-            <h2 className="text-xl font-bold">Experience</h2>
-            {isAdmin && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="ml-auto"
-                onClick={() =>
-                  addRow(
-                    "experience",
-                    { role: "New role", company: "Company", duration: "", category: "experience", sort_order: 999 },
-                    "experience"
-                  )
-                }
-              >
-                <Plus className="h-3.5 w-3.5 mr-1.5" /> Add
-              </Button>
-            )}
-          </div>
-          <div className="relative pl-7 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-px before:bg-border">
-            {(experience as any[]).filter((e: any) => (e.category ?? "experience") === "experience").map((exp: any, i: number) => (
-              <ExperienceItem key={exp.id} exp={exp} i={i} isAdmin={isAdmin} onDelete={() => removeRow("experience", exp.id, "experience")} />
-            ))}
-          </div>
-        </Card>
-      )}
-
-      {/* LEADERSHIP & ACTIVITIES */}
-      {((experience as any[]).some((e: any) => e.category === "leadership") || isAdmin) && (
-        <Card className="p-6 md:p-8">
-          <div className="flex items-center gap-2 mb-6">
-            <Award className="h-5 w-5 text-primary" />
-            <h2 className="text-xl font-bold">Leadership & Activities</h2>
-            {isAdmin && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="ml-auto"
-                onClick={() =>
-                  addRow(
-                    "experience",
-                    { role: "New role", company: "Organisation", duration: "", category: "leadership", sort_order: 999 },
-                    "experience"
-                  )
-                }
-              >
-                <Plus className="h-3.5 w-3.5 mr-1.5" /> Add
-              </Button>
-            )}
-          </div>
-          <div className="relative pl-7 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-px before:bg-border">
-            {(experience as any[]).filter((e: any) => e.category === "leadership").map((exp: any, i: number) => (
-              <ExperienceItem key={exp.id} exp={exp} i={i} isAdmin={isAdmin} onDelete={() => removeRow("experience", exp.id, "experience")} />
-            ))}
-          </div>
-        </Card>
-      )}
-
-      {/* SKILLS grouped */}
-      {skills.length > 0 && (
-        <Card className="p-6 md:p-8">
-          <div className="flex items-center gap-2 mb-6">
-            <Code2 className="h-5 w-5 text-primary" />
-            <h2 className="text-xl font-bold">Skills</h2>
-          </div>
-          <div className="space-y-5">
-            {(Object.entries(skillsByCategory) as [string, any[]][]).map(([cat, list]) => (
-              <div key={cat}>
-                <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-2">{cat}</p>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {list.map((s) => (
-                    <div key={s.id} className="text-sm px-3 py-2 rounded-md border border-border bg-card hover:border-primary/40 transition-colors text-center">
-                      {s.name}
+      {/* TWO-COLUMN: Experience & Skills */}
+      <div className="grid lg:grid-cols-[1.6fr,1fr] gap-6">
+        {/* EXPERIENCE TIMELINE */}
+        {(experience.length > 0 || isAdmin) && (
+          <Card className="p-6 md:p-8">
+            <div className="flex items-center gap-2 mb-6">
+              <Briefcase className="h-5 w-5 text-primary" />
+              <h2 className="text-xl font-bold">Experience</h2>
+              {isAdmin && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="ml-auto"
+                  onClick={() =>
+                    addRow(
+                      "experience",
+                      { role: "New role", company: "Company", duration: "", sort_order: 999 },
+                      "experience"
+                    )
+                  }
+                >
+                  <Plus className="h-3.5 w-3.5 mr-1.5" /> Add
+                </Button>
+              )}
+            </div>
+            <div className="relative pl-7 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-px before:bg-border">
+              {(experience as any[]).map((exp, i) => (
+                <motion.div
+                  key={exp.id}
+                  initial={{ opacity: 0, x: -10 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: i * 0.05 }}
+                  className="relative group"
+                >
+                  <span className="absolute -left-[22px] top-1.5 h-3 w-3 rounded-full bg-primary ring-4 ring-background" />
+                  <div className="flex flex-wrap items-baseline justify-between gap-2 mb-1">
+                    <h3 className="font-semibold">{exp.role}</h3>
+                    <span className="text-xs text-muted-foreground font-mono">{exp.duration}</span>
+                  </div>
+                  <p className="text-sm text-primary font-medium mb-1.5">{exp.company}</p>
+                  {exp.description && <p className="text-sm text-muted-foreground mb-2 whitespace-pre-line">{exp.description}</p>}
+                  {exp.tech?.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {exp.tech.map((t: string) => (
+                        <span key={t} className="text-[11px] px-2 py-0.5 rounded bg-secondary text-secondary-foreground font-mono">{t}</span>
+                      ))}
                     </div>
-                  ))}
+                  )}
+                  {isAdmin && (
+                    <div className="absolute top-0 right-0 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <InlineEdit
+                        table="experience"
+                        rowId={exp.id}
+                        row={exp}
+                        invalidateKeys={["experience"]}
+                        label="Edit experience"
+                        fields={[
+                          { key: "role", label: "Role" },
+                          { key: "company", label: "Company" },
+                          { key: "duration", label: "Duration" },
+                          { key: "description", label: "Description", type: "textarea" },
+                        ]}
+                      />
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7"
+                        onClick={() => removeRow("experience", exp.id, "experience")}
+                        aria-label="Delete"
+                      >
+                        <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                      </Button>
+                    </div>
+                  )}
+                </motion.div>
+              ))}
+            </div>
+          </Card>
+        )}
+
+        {/* SKILLS grouped */}
+        {skills.length > 0 && (
+          <Card className="p-6 md:p-8">
+            <div className="flex items-center gap-2 mb-6">
+              <Code2 className="h-5 w-5 text-primary" />
+              <h2 className="text-xl font-bold">Skills</h2>
+            </div>
+            <div className="space-y-5">
+              {(Object.entries(skillsByCategory) as [string, any[]][]).map(([cat, list]) => (
+                <div key={cat}>
+                  <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-2">{cat}</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {list.map((s) => (
+                      <div key={s.id} className="text-sm px-3 py-2 rounded-md border border-border bg-card hover:border-primary/40 transition-colors text-center">
+                        {s.name}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </Card>
-      )}
+              ))}
+            </div>
+          </Card>
+        )}
+      </div>
 
       {/* EDUCATION */}
       {(education.length > 0 || isAdmin) && (
@@ -642,67 +627,5 @@ export default function Overview() {
         </Section>
       )}
     </div>
-  );
-}
-
-function ExperienceItem({
-  exp,
-  i,
-  isAdmin,
-  onDelete,
-}: {
-  exp: any;
-  i: number;
-  isAdmin: boolean;
-  onDelete: () => void;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: -10 }}
-      whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.4, delay: i * 0.05 }}
-      className="relative group"
-    >
-      <span className="absolute -left-[22px] top-1.5 h-3 w-3 rounded-full bg-primary ring-4 ring-background" />
-      <div className="flex flex-wrap items-baseline justify-between gap-2 mb-1">
-        <h3 className="font-semibold">{exp.role}</h3>
-        <span className="text-xs text-muted-foreground font-mono">{exp.duration}</span>
-      </div>
-      <p className="text-sm text-primary font-medium mb-1.5">{exp.company}</p>
-      {exp.description && (
-        <p className="text-sm text-muted-foreground mb-2 whitespace-pre-line">{exp.description}</p>
-      )}
-      {exp.tech?.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          {exp.tech.map((t: string) => (
-            <span key={t} className="text-[11px] px-2 py-0.5 rounded bg-secondary text-secondary-foreground font-mono">
-              {t}
-            </span>
-          ))}
-        </div>
-      )}
-      {isAdmin && (
-        <div className="absolute top-0 right-0 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          <InlineEdit
-            table="experience"
-            rowId={exp.id}
-            row={exp}
-            invalidateKeys={["experience"]}
-            label="Edit entry"
-            fields={[
-              { key: "role", label: "Role" },
-              { key: "company", label: "Company / Organisation" },
-              { key: "duration", label: "Duration" },
-              { key: "description", label: "Description", type: "textarea" },
-              { key: "category", label: "Category (experience or leadership)" },
-            ]}
-          />
-          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onDelete} aria-label="Delete">
-            <Trash2 className="h-3.5 w-3.5 text-destructive" />
-          </Button>
-        </div>
-      )}
-    </motion.div>
   );
 }

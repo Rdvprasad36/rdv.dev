@@ -28,13 +28,10 @@ export default function Blog() {
   const { data: posts = [], isLoading } = useQuery({
     queryKey: ["posts"],
     queryFn: async () => {
-      // Retrieve up to 1000 posts, ordered by post_date when set, falling back to created_at
       const { data, error } = await supabase
         .from("posts")
         .select("*")
-        .order("post_date", { ascending: false, nullsFirst: false })
-        .order("created_at", { ascending: false })
-        .limit(1000);
+        .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
     },

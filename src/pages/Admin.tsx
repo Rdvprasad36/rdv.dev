@@ -78,7 +78,6 @@ export default function Admin() {
           <TabsTrigger value="education">Education</TabsTrigger>
           <TabsTrigger value="skills">Skills</TabsTrigger>
           <TabsTrigger value="achievements">Achievements</TabsTrigger>
-          <TabsTrigger value="logos">Logos</TabsTrigger>
           <TabsTrigger value="inquiries">Inquiries</TabsTrigger>
         </TabsList>
 
@@ -186,11 +185,10 @@ export default function Admin() {
             queryKey="experience"
             fields={[
               { key: "role", label: "Role" },
-              { key: "company", label: "Company / Organisation" },
+              { key: "company", label: "Company" },
               { key: "duration", label: "Duration" },
               { key: "description", label: "Description", textarea: true },
               { key: "tech", label: "Tech (comma-separated)", array: true },
-              { key: "category", label: "Category (experience or leadership)" },
               { key: "sort_order", label: "Sort", type: "number" },
             ]}
             requiredFields={["role", "company"]}
@@ -239,24 +237,6 @@ export default function Admin() {
             ]}
             requiredFields={["title"]}
           />
-        </TabsContent>
-
-        <TabsContent value="logos" className="mt-6">
-          <SimpleListEditor
-            table="logos"
-            queryKey="logos"
-            fields={[
-              { key: "title", label: "Title" },
-              { key: "description", label: "Description", textarea: true },
-              { key: "client", label: "Client" },
-              { key: "year", label: "Year" },
-              { key: "sort_order", label: "Sort", type: "number" },
-            ]}
-            requiredFields={["title"]}
-          />
-          <p className="text-xs text-muted-foreground mt-3">
-            💡 To upload images for logos, head to the <a href="/projects" className="text-primary underline">Projects page → Logo Design tab</a> and click <strong>Add logo</strong>.
-          </p>
         </TabsContent>
 
         <TabsContent value="inquiries" className="mt-6">

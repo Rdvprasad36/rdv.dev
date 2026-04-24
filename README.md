@@ -1,3 +1,11 @@
-# Welcome to your Lovable project
+# Welcome to my portfolio.. 
 
-TODO: Document your project here
+# 🚀 RDV.Dev 
+The Living PortfolioRDV.Dev is not just a static portfolio—it is a full-scale Content Management System (CMS) designed for developers. Built with a "Self-Managed Ecosystem" philosophy, it allows the owner to update experiences, projects, and blogs in real-time via a secure Admin Command Center without ever touching the codebase.✨ Key Features🖥️ For Visitors (Public)LinkedIn-Style Experience: A professional "Deep Blue" aesthetic optimized for recruiter UX.Interactive Timeline: A dynamic, animated history of roles and education.Social Blog Feed: A custom-built feed for technical updates with "Like" functionality.Live Stats: Real-time data visualization of GitHub contributions and LeetCode progress.One-Click Resume: Instant download of the latest resume version stored in the cloud.🔐 For Admin (You)Inline Editing: Log in as admin to see "Edit" icons across the entire site. Click and type to update.Asset Management: Integrated file upload system for profile photos and Resumes using Supabase Storage.Role-Based Security: Fully protected backend routes ensuring only the admin email can modify data.Theme Sync: Branding automatically shifts between light and dark modes with dedicated logo assets.🛠️ Tech StackLayerTechnologyFrontendNext.js 14 (App Router), TypeScriptStylingTailwind CSS (Deep Blue Theme)AnimationsFramer MotionBackendSupabase (PostgreSQL)AuthSupabase Auth (Admin Role)StorageSupabase Buckets (Images & PDFs)UI ComponentsShadcn/UI🚀 Getting Started1. Clone the repoBashgit clone https://github.com/your-username/rdv-dev.git
+cd rdv-dev
+2. Install dependenciesBashnpm install
+3. Set up Environment VariablesCreate a .env.local file and add your Supabase credentials:Code snippetNEXT_PUBLIC_SUPABASE_URL=your_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+ADMIN_EMAIL=admin@gmail.com
+4. Run the development serverBashnpm run dev
+📸 Preview LogicIntro Animation: High-end stagger effect on logo and brand name.Availability Badge: Pulsing green indicator for recruiter engagement.Bento Grid Stats: Sophisticated layout for DSA and GitHub metrics.🛡️ LicenseDistributed under the MIT License. See LICENSE for more information.📬 ContactYour Name - LinkedIn - EmailProject Link: https://github.com/your-username/rdv-dev💡 Why "The Living Portfolio"?"Static portfolios are the resumes of the past. A living portfolio is a system that grows as the developer grows, proving mastery of full-stack architecture through its own functionality."

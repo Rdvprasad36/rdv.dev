@@ -644,3 +644,65 @@ export default function Overview() {
     </div>
   );
 }
+
+function ExperienceItem({
+  exp,
+  i,
+  isAdmin,
+  onDelete,
+}: {
+  exp: any;
+  i: number;
+  isAdmin: boolean;
+  onDelete: () => void;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -10 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4, delay: i * 0.05 }}
+      className="relative group"
+    >
+      <span className="absolute -left-[22px] top-1.5 h-3 w-3 rounded-full bg-primary ring-4 ring-background" />
+      <div className="flex flex-wrap items-baseline justify-between gap-2 mb-1">
+        <h3 className="font-semibold">{exp.role}</h3>
+        <span className="text-xs text-muted-foreground font-mono">{exp.duration}</span>
+      </div>
+      <p className="text-sm text-primary font-medium mb-1.5">{exp.company}</p>
+      {exp.description && (
+        <p className="text-sm text-muted-foreground mb-2 whitespace-pre-line">{exp.description}</p>
+      )}
+      {exp.tech?.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {exp.tech.map((t: string) => (
+            <span key={t} className="text-[11px] px-2 py-0.5 rounded bg-secondary text-secondary-foreground font-mono">
+              {t}
+            </span>
+          ))}
+        </div>
+      )}
+      {isAdmin && (
+        <div className="absolute top-0 right-0 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <InlineEdit
+            table="experience"
+            rowId={exp.id}
+            row={exp}
+            invalidateKeys={["experience"]}
+            label="Edit entry"
+            fields={[
+              { key: "role", label: "Role" },
+              { key: "company", label: "Company / Organisation" },
+              { key: "duration", label: "Duration" },
+              { key: "description", label: "Description", type: "textarea" },
+              { key: "category", label: "Category (experience or leadership)" },
+            ]}
+          />
+          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onDelete} aria-label="Delete">
+            <Trash2 className="h-3.5 w-3.5 text-destructive" />
+          </Button>
+        </div>
+      )}
+    </motion.div>
+  );
+}

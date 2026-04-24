@@ -60,87 +60,8 @@ export default function Stats() {
 
   return (
     <Section eyebrow="Activity" title="Coding Stats" description="Live data from my LeetCode, CodeChef and GitHub profiles.">
-      {/* ============= GITHUB AREA — everything in one block ============= */}
-      <Card className="p-6">
-        <div className="flex items-center gap-2 mb-5">
-          <Github className="h-5 w-5" />
-          <h3 className="font-semibold">GitHub</h3>
-          {profile?.github_username && (
-            <a
-              href={`https://github.com/${profile.github_username}`}
-              target="_blank"
-              rel="noreferrer"
-              className="ml-auto text-xs text-muted-foreground hover:text-foreground"
-            >
-              @{profile.github_username}
-            </a>
-          )}
-        </div>
-
-        {!profile?.github_username ? (
-          <p className="text-sm text-muted-foreground">Add a GitHub username in admin to see stats.</p>
-        ) : ghLoading ? (
-          <div className="space-y-3"><Skeleton className="h-16" /><Skeleton className="h-24" /></div>
-        ) : (
-          <div className="space-y-5">
-            <div className="grid grid-cols-3 gap-3">
-              <Stat icon={<Code2 className="h-4 w-4" />} label="Repos" value={githubStats?.public_repos ?? "—"} />
-              <Stat icon={<Activity className="h-4 w-4" />} label="Followers" value={githubStats?.followers ?? "—"} />
-              <Stat icon={<Trophy className="h-4 w-4" />} label="Following" value={githubStats?.following ?? "—"} />
-            </div>
-
-            <div>
-              <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-2 inline-flex items-center gap-1.5">
-                <CalendarDays className="h-3.5 w-3.5" /> Contribution graph
-              </p>
-              <img
-                src={`https://ghchart.rshah.org/${profile.github_username}`}
-                alt="GitHub contributions"
-                loading="lazy"
-                className="w-full rounded-md"
-              />
-            </div>
-
-            <div>
-              <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-2 inline-flex items-center gap-1.5">
-                <Flame className="h-3.5 w-3.5 text-orange-500" /> Streak
-              </p>
-              <div className="flex justify-center overflow-x-auto">
-                <img
-                  src={`https://github-readme-streak-stats.herokuapp.com/?user=${encodeURIComponent(profile.github_username)}&theme=transparent&hide_border=true&background=00000000&ring=2563EB&fire=F97316&currStreakLabel=2563EB`}
-                  alt={`GitHub streak for ${profile.github_username}`}
-                  loading="lazy"
-                  className="max-w-full h-auto"
-                />
-              </div>
-            </div>
-
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div>
-                <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-2">Top languages</p>
-                <img
-                  src={`https://github-readme-stats.vercel.app/api/top-langs/?username=${encodeURIComponent(profile.github_username)}&layout=compact&theme=transparent&hide_border=true&bg_color=00000000&title_color=2563EB&text_color=888`}
-                  alt="Top languages"
-                  loading="lazy"
-                  className="w-full"
-                />
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-2">Stats card</p>
-                <img
-                  src={`https://github-readme-stats.vercel.app/api?username=${encodeURIComponent(profile.github_username)}&show_icons=true&theme=transparent&hide_border=true&bg_color=00000000&title_color=2563EB&icon_color=2563EB&text_color=888`}
-                  alt="GitHub stats card"
-                  loading="lazy"
-                  className="w-full"
-                />
-              </div>
-            </div>
-          </div>
-        )}
-      </Card>
-
-      {/* ============= LEETCODE + CODECHEF row ============= */}
-      <div className="grid lg:grid-cols-2 gap-5 mt-5">
+      {/* ============= LEETCODE + CODECHEF row (FIRST) ============= */}
+      <div className="grid lg:grid-cols-2 gap-5">
         {/* LeetCode */}
         <Card className="p-6">
           <div className="flex items-center gap-2 mb-4">
@@ -230,6 +151,85 @@ export default function Stats() {
           )}
         </Card>
       </div>
+
+      {/* ============= GITHUB AREA (SECOND) ============= */}
+      <Card className="p-6 mt-5">
+        <div className="flex items-center gap-2 mb-5">
+          <Github className="h-5 w-5" />
+          <h3 className="font-semibold">GitHub</h3>
+          {profile?.github_username && (
+            <a
+              href={`https://github.com/${profile.github_username}`}
+              target="_blank"
+              rel="noreferrer"
+              className="ml-auto text-xs text-muted-foreground hover:text-foreground"
+            >
+              @{profile.github_username}
+            </a>
+          )}
+        </div>
+
+        {!profile?.github_username ? (
+          <p className="text-sm text-muted-foreground">Add a GitHub username in admin to see stats.</p>
+        ) : ghLoading ? (
+          <div className="space-y-3"><Skeleton className="h-16" /><Skeleton className="h-24" /></div>
+        ) : (
+          <div className="space-y-5">
+            <div className="grid grid-cols-3 gap-3">
+              <Stat icon={<Code2 className="h-4 w-4" />} label="Repos" value={githubStats?.public_repos ?? "—"} />
+              <Stat icon={<Activity className="h-4 w-4" />} label="Followers" value={githubStats?.followers ?? "—"} />
+              <Stat icon={<Trophy className="h-4 w-4" />} label="Following" value={githubStats?.following ?? "—"} />
+            </div>
+
+            <div>
+              <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-2 inline-flex items-center gap-1.5">
+                <CalendarDays className="h-3.5 w-3.5" /> Contribution graph
+              </p>
+              <img
+                src={`https://ghchart.rshah.org/${profile.github_username}`}
+                alt="GitHub contributions"
+                loading="lazy"
+                className="w-full rounded-md"
+              />
+            </div>
+
+            <div>
+              <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-2 inline-flex items-center gap-1.5">
+                <Flame className="h-3.5 w-3.5 text-orange-500" /> Streak
+              </p>
+              <div className="flex justify-center overflow-x-auto">
+                <img
+                  src={`https://github-readme-streak-stats.herokuapp.com/?user=${encodeURIComponent(profile.github_username)}&theme=transparent&hide_border=true&background=00000000&ring=2563EB&fire=F97316&currStreakLabel=2563EB`}
+                  alt={`GitHub streak for ${profile.github_username}`}
+                  loading="lazy"
+                  className="max-w-full h-auto"
+                />
+              </div>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div>
+                <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-2">Top languages</p>
+                <img
+                  src={`https://github-readme-stats.vercel.app/api/top-langs/?username=${encodeURIComponent(profile.github_username)}&layout=compact&theme=transparent&hide_border=true&bg_color=00000000&title_color=2563EB&text_color=888`}
+                  alt="Top languages"
+                  loading="lazy"
+                  className="w-full"
+                />
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-2">Stats card</p>
+                <img
+                  src={`https://github-readme-stats.vercel.app/api?username=${encodeURIComponent(profile.github_username)}&show_icons=true&theme=transparent&hide_border=true&bg_color=00000000&title_color=2563EB&icon_color=2563EB&text_color=888`}
+                  alt="GitHub stats card"
+                  loading="lazy"
+                  className="w-full"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+      </Card>
     </Section>
   );
 }

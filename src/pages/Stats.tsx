@@ -59,7 +59,7 @@ export default function Stats() {
   });
 
   return (
-    <Section eyebrow="Activity" title="Coding Stats" description="Live data from my GitHub, LeetCode and CodeChef profiles.">
+    <Section eyebrow="Activity" title="Coding Stats" description="Live data from my LeetCode, CodeChef and GitHub profiles.">
       {/* ============= GITHUB AREA — everything in one block ============= */}
       <Card className="p-6">
         <div className="flex items-center gap-2 mb-5">

@@ -7,7 +7,7 @@ export function Footer() {
     <footer className="border-t border-border/40 mt-24">
       <div className="container py-10 flex flex-col md:flex-row items-center justify-between gap-4">
         <p className="text-sm text-muted-foreground">
-          © {new Date().getFullYear()} {profile?.name ?? "RDV.Dev"} — Built with React & Lovable Cloud.
+          © {new Date().getFullYear()} {profile?.name ?? "RDV.Dev"}
         </p>
         <div className="flex items-center gap-2">
           {profile?.github_url && (

@@ -55,7 +55,7 @@ export function Intro() {
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.4, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
               >
-                R D V <span className="gradient-text">Prasad</span>
+                R D V <span className="text-white">Prasad</span>
               </motion.h1>
             </div>
 

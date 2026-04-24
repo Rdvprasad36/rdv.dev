@@ -10,7 +10,7 @@ export function ImageUpload({
   onChange,
   accept = "image/*",
 }: {
-  bucket: "avatars" | "projects" | "posts" | "resumes";
+  bucket: "avatars" | "projects" | "posts" | "resumes" | "logos";
   value?: string | null;
   onChange: (url: string) => void;
   accept?: string;

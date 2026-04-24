@@ -408,46 +408,91 @@ export default function Overview() {
         </motion.div>
       )}
 
-      {/* TWO-COLUMN: Experience & Skills */}
-      <div className="grid lg:grid-cols-[1.6fr,1fr] gap-6">
-        {/* EXPERIENCE TIMELINE */}
-        {(experience.length > 0 || isAdmin) && (
-          <Card className="p-6 md:p-8">
-            <div className="flex items-center gap-2 mb-6">
-              <Briefcase className="h-5 w-5 text-primary" />
-              <h2 className="text-xl font-bold">Experience</h2>
-              {isAdmin && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="ml-auto"
-                  onClick={() =>
-                    addRow(
-                      "experience",
-                      { role: "New role", company: "Company", duration: "", sort_order: 999 },
-                      "experience"
-                    )
-                  }
-                >
-                  <Plus className="h-3.5 w-3.5 mr-1.5" /> Add
-                </Button>
-              )}
-            </div>
-            <div className="relative pl-7 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-px before:bg-border">
-              {(experience as any[]).map((exp, i) => (
-                <motion.div
-                  key={exp.id}
-                  initial={{ opacity: 0, x: -10 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: i * 0.05 }}
-                  className="relative group"
-                >
-  // Split experience into work + leadership groups
-  const workExperience = (experience as any[]).filter((e) => (e.category ?? "experience") === "experience");
-  const leadership = (experience as any[]).filter((e) => e.category === "leadership");
+      {/* EXPERIENCE & LEADERSHIP grouped */}
+      {(experience.length > 0 || isAdmin) && (
+        <Card className="p-6 md:p-8">
+          <div className="flex items-center gap-2 mb-6">
+            <Briefcase className="h-5 w-5 text-primary" />
+            <h2 className="text-xl font-bold">Experience</h2>
+            {isAdmin && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="ml-auto"
+                onClick={() =>
+                  addRow(
+                    "experience",
+                    { role: "New role", company: "Company", duration: "", category: "experience", sort_order: 999 },
+                    "experience"
+                  )
+                }
+              >
+                <Plus className="h-3.5 w-3.5 mr-1.5" /> Add
+              </Button>
+            )}
+          </div>
+          <div className="relative pl-7 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-px before:bg-border">
+            {(experience as any[]).filter((e: any) => (e.category ?? "experience") === "experience").map((exp: any, i: number) => (
+              <ExperienceItem key={exp.id} exp={exp} i={i} isAdmin={isAdmin} onDelete={() => removeRow("experience", exp.id, "experience")} />
+            ))}
+          </div>
+        </Card>
+      )}
 
-  return null; // placeholder, replaced below
+      {/* LEADERSHIP & ACTIVITIES */}
+      {((experience as any[]).some((e: any) => e.category === "leadership") || isAdmin) && (
+        <Card className="p-6 md:p-8">
+          <div className="flex items-center gap-2 mb-6">
+            <Award className="h-5 w-5 text-primary" />
+            <h2 className="text-xl font-bold">Leadership & Activities</h2>
+            {isAdmin && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="ml-auto"
+                onClick={() =>
+                  addRow(
+                    "experience",
+                    { role: "New role", company: "Organisation", duration: "", category: "leadership", sort_order: 999 },
+                    "experience"
+                  )
+                }
+              >
+                <Plus className="h-3.5 w-3.5 mr-1.5" /> Add
+              </Button>
+            )}
+          </div>
+          <div className="relative pl-7 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-px before:bg-border">
+            {(experience as any[]).filter((e: any) => e.category === "leadership").map((exp: any, i: number) => (
+              <ExperienceItem key={exp.id} exp={exp} i={i} isAdmin={isAdmin} onDelete={() => removeRow("experience", exp.id, "experience")} />
+            ))}
+          </div>
+        </Card>
+      )}
+
+      {/* SKILLS grouped */}
+      {skills.length > 0 && (
+        <Card className="p-6 md:p-8">
+          <div className="flex items-center gap-2 mb-6">
+            <Code2 className="h-5 w-5 text-primary" />
+            <h2 className="text-xl font-bold">Skills</h2>
+          </div>
+          <div className="space-y-5">
+            {(Object.entries(skillsByCategory) as [string, any[]][]).map(([cat, list]) => (
+              <div key={cat}>
+                <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-2">{cat}</p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {list.map((s) => (
+                    <div key={s.id} className="text-sm px-3 py-2 rounded-md border border-border bg-card hover:border-primary/40 transition-colors text-center">
+                      {s.name}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
 
       {/* EDUCATION */}
       {(education.length > 0 || isAdmin) && (

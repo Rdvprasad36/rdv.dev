@@ -539,7 +539,30 @@ export default function Overview() {
               <div className="space-y-5">
                 {(Object.entries(skillsByCategory) as [string, any[]][]).map(([cat, list]) => (
                   <div key={cat}>
-                    <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-2">{cat}</p>
+                    <div className="flex items-center gap-2 mb-2">
+                      <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{cat}</p>
+                      {isAdmin && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 px-2 text-[10px]"
+                          onClick={async () => {
+                            const next = window.prompt(`Rename category "${cat}" to:`, cat);
+                            if (!next || next.trim() === "" || next === cat) return;
+                            const ids = list.map((s) => s.id);
+                            const { error } = await supabase
+                              .from("skills")
+                              .update({ category: next.trim() })
+                              .in("id", ids);
+                            if (error) return toast.error(error.message);
+                            toast.success("Category renamed");
+                            queryClient.invalidateQueries({ queryKey: ["skills"] });
+                          }}
+                        >
+                          Rename
+                        </Button>
+                      )}
+                    </div>
                     <div className="grid grid-cols-2 gap-2">
                       {list.map((s) => (
                         <div

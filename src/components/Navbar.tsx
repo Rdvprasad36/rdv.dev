@@ -11,11 +11,13 @@ import {
   Github,
   BookOpen,
   Mail,
+  Shield,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 import logoWhite from "@/assets/logo-white.png";
 import logoBlack from "@/assets/logo-black.png";
 import { cn } from "@/lib/utils";
@@ -33,6 +35,35 @@ export function Navbar() {
   const { user, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    if (!isAdmin) {
+      setUnreadCount(0);
+      return;
+    }
+    let active = true;
+    async function loadUnread() {
+      const { count } = await supabase
+        .from("inquiries")
+        .select("id", { count: "exact", head: true })
+        .eq("is_read", false);
+      if (active) setUnreadCount(count ?? 0);
+    }
+    loadUnread();
+    const channel = supabase
+      .channel("inquiries-nav")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "inquiries" },
+        () => loadUnread()
+      )
+      .subscribe();
+    return () => {
+      active = false;
+      supabase.removeChannel(channel);
+    };
+  }, [isAdmin]);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 glass">
@@ -70,6 +101,27 @@ export function Navbar() {
               </NavLink>
             );
           })}
+          {isAdmin && (
+            <NavLink
+              to="/admin"
+              className={({ isActive }) =>
+                cn(
+                  "relative px-3 py-2 text-sm font-medium rounded-md transition-colors inline-flex items-center gap-1.5",
+                  isActive
+                    ? "text-primary bg-accent"
+                    : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                )
+              }
+            >
+              <Shield className="h-4 w-4" />
+              Admin
+              {unreadCount > 0 && (
+                <span className="ml-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold">
+                  {unreadCount}
+                </span>
+              )}
+            </NavLink>
+          )}
         </div>
 
         <div className="flex items-center gap-2">
@@ -133,6 +185,28 @@ export function Navbar() {
                 </NavLink>
               );
             })}
+            {isAdmin && (
+              <NavLink
+                to="/admin"
+                onClick={() => setOpen(false)}
+                className={({ isActive }) =>
+                  cn(
+                    "px-3 py-2 text-sm font-medium rounded-md inline-flex items-center gap-2",
+                    isActive
+                      ? "text-primary bg-accent"
+                      : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                  )
+                }
+              >
+                <Shield className="h-4 w-4" />
+                Admin
+                {unreadCount > 0 && (
+                  <span className="ml-auto inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold">
+                    {unreadCount}
+                  </span>
+                )}
+              </NavLink>
+            )}
           </div>
         </div>
       )}

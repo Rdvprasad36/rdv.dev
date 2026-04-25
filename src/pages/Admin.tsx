@@ -69,16 +69,16 @@ export default function Admin() {
   }
 
   return (
-    <Section eyebrow="CMS" title="Admin Dashboard" description="Manage your portfolio content.">
-      <Tabs defaultValue="profile">
+    <Section eyebrow="CMS" title="Admin Dashboard" description="Manage your portfolio content and read messages from visitors.">
+      <Tabs defaultValue="inquiries">
         <TabsList className="flex-wrap h-auto">
+          <TabsTrigger value="inquiries">Messages</TabsTrigger>
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="overview">Overview Sections</TabsTrigger>
           <TabsTrigger value="experience">Experience</TabsTrigger>
           <TabsTrigger value="education">Education</TabsTrigger>
           <TabsTrigger value="skills">Skills</TabsTrigger>
           <TabsTrigger value="achievements">Achievements</TabsTrigger>
-          <TabsTrigger value="inquiries">Inquiries</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile" className="mt-6">
@@ -373,6 +373,7 @@ function SimpleListEditor({
 }
 
 function InquiriesList() {
+  const queryClient = useQueryClient();
   const { data: items = [], refetch } = useQuery({
     queryKey: ["inquiries"],
     queryFn: async () => {
@@ -381,6 +382,16 @@ function InquiriesList() {
       return data;
     },
   });
+
+  // Auto-mark unread inquiries as read when admin opens the tab
+  useEffect(() => {
+    const unreadIds = (items as any[]).filter((i) => !i.is_read).map((i) => i.id);
+    if (unreadIds.length === 0) return;
+    (async () => {
+      await supabase.from("inquiries").update({ is_read: true }).in("id", unreadIds);
+      queryClient.invalidateQueries({ queryKey: ["inquiries"] });
+    })();
+  }, [items, queryClient]);
 
   async function remove(id: string) {
     if (!confirm("Delete inquiry?")) return;
@@ -391,16 +402,22 @@ function InquiriesList() {
   }
 
   if (items.length === 0) {
-    return <Card className="p-8 text-center text-sm text-muted-foreground">No inquiries yet.</Card>;
+    return <Card className="p-8 text-center text-sm text-muted-foreground">No messages yet. When visitors send a message from the Contact page it will appear here.</Card>;
   }
 
   return (
     <div className="space-y-3">
       {items.map((q: any) => (
-        <Card key={q.id} className="p-5">
+        <Card key={q.id} className={`p-5 ${!q.is_read ? "border-primary/60 bg-primary/5" : ""}`}>
           <div className="flex items-start justify-between gap-3 mb-2">
-            <div>
-              <p className="font-medium">{q.name} <span className="text-muted-foreground font-normal">· {q.email}</span></p>
+            <div className="flex-1 min-w-0">
+              <p className="font-medium flex items-center gap-2">
+                {!q.is_read && <span className="inline-block h-2 w-2 rounded-full bg-primary" aria-label="New" />}
+                {q.name}
+                <a href={`mailto:${q.email}`} className="text-muted-foreground font-normal text-sm hover:text-primary truncate">
+                  · {q.email}
+                </a>
+              </p>
               <p className="text-xs text-muted-foreground">{new Date(q.created_at).toLocaleString()}</p>
             </div>
             <Button size="sm" variant="ghost" onClick={() => remove(q.id)}>

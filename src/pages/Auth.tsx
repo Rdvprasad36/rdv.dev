@@ -42,10 +42,22 @@ export default function Auth() {
             <div className="inline-flex p-3 rounded-full bg-primary/10 mb-3">
               <LogIn className="h-5 w-5 text-primary" />
             </div>
-            <h1 className="text-2xl font-bold">Admin Sign in</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Restricted access. Sign in to manage your portfolio.
+            <h1 className="text-2xl font-bold">Admin sign in</h1>
+            <p className="text-sm text-muted-foreground mt-2">
+              This sign‑in is for the <span className="font-semibold text-foreground">website owner</span> only.
             </p>
+            <div className="mt-3 text-xs text-muted-foreground rounded-md bg-secondary/60 border border-border/60 p-3 text-left">
+              <p className="font-semibold text-foreground mb-1">Admin features unlock:</p>
+              <ul className="list-disc list-inside space-y-0.5">
+                <li>Edit profile, bio, contact & resume</li>
+                <li>Manage experience, education, skills & achievements</li>
+                <li>Add / remove projects, posts & logo designs</li>
+                <li>Read inquiries from the contact form</li>
+              </ul>
+              <p className="mt-2 text-[11px] text-muted-foreground/80">
+                Visitors can browse everything without signing in.
+              </p>
+            </div>
           </div>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -57,11 +69,11 @@ export default function Auth() {
               <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
             </div>
             <Button type="submit" disabled={loading} className="w-full bg-gradient-primary text-primary-foreground hover:opacity-90">
-              {loading ? "Signing in…" : "Sign in"}
+              {loading ? "Signing in…" : "Sign in as admin"}
             </Button>
           </form>
           <p className="text-xs text-muted-foreground text-center mt-6">
-            Don't have an account? Visit the Admin page to create one (it will be granted admin role automatically if no admin exists yet).
+            First-time setup? Create the initial admin account below — only allowed when no admin exists yet.
           </p>
           <Button variant="link" className="w-full mt-2" onClick={() => navigate("/admin/setup")}>
             Create initial admin account

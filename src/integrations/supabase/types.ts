@@ -250,6 +250,7 @@ export type Database = {
           created_at: string
           id: string
           image_url: string | null
+          image_urls: string[]
           likes_count: number
           post_date: string | null
           updated_at: string
@@ -259,6 +260,7 @@ export type Database = {
           created_at?: string
           id?: string
           image_url?: string | null
+          image_urls?: string[]
           likes_count?: number
           post_date?: string | null
           updated_at?: string
@@ -268,6 +270,7 @@ export type Database = {
           created_at?: string
           id?: string
           image_url?: string | null
+          image_urls?: string[]
           likes_count?: number
           post_date?: string | null
           updated_at?: string

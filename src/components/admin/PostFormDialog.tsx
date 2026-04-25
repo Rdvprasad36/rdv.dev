@@ -8,6 +8,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ImageUpload } from "./ImageUpload";
+import { X } from "lucide-react";
+
+const MAX_IMAGES = 4;
 
 export function PostFormDialog({
   open,
@@ -20,14 +23,19 @@ export function PostFormDialog({
 }) {
   const queryClient = useQueryClient();
   const [content, setContent] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [postDate, setPostDate] = useState("");
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     setContent(post?.content ?? "");
-    setImageUrl(post?.image_url ?? "");
-    // datetime-local needs YYYY-MM-DDTHH:mm
+    // Prefer image_urls array, fall back to legacy single image_url
+    const urls: string[] = Array.isArray(post?.image_urls) && post.image_urls.length
+      ? post.image_urls
+      : post?.image_url
+      ? [post.image_url]
+      : [];
+    setImageUrls(urls);
     const d = post?.post_date ?? post?.created_at;
     if (d) {
       const dt = new Date(d);
@@ -38,6 +46,15 @@ export function PostFormDialog({
     }
   }, [post, open]);
 
+  function addImage(url: string) {
+    if (!url) return;
+    setImageUrls((prev) => (prev.length >= MAX_IMAGES ? prev : [...prev, url]));
+  }
+
+  function removeImage(idx: number) {
+    setImageUrls((prev) => prev.filter((_, i) => i !== idx));
+  }
+
   async function save() {
     if (!content.trim()) {
       toast.error("Content is required");
@@ -46,7 +63,8 @@ export function PostFormDialog({
     setSaving(true);
     const payload: any = {
       content: content.trim(),
-      image_url: imageUrl || null,
+      image_urls: imageUrls,
+      image_url: imageUrls[0] ?? null, // keep legacy field in sync
       post_date: postDate ? new Date(postDate).toISOString() : null,
     };
     const { error } = post
@@ -61,7 +79,7 @@ export function PostFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{post ? "Edit post" : "New post"}</DialogTitle>
         </DialogHeader>
@@ -71,8 +89,29 @@ export function PostFormDialog({
             <Textarea rows={6} value={content} onChange={(e) => setContent(e.target.value)} placeholder="Share an update…" />
           </div>
           <div>
-            <Label>Image (optional)</Label>
-            <ImageUpload bucket="posts" value={imageUrl} onChange={setImageUrl} />
+            <Label>
+              Images <span className="text-xs text-muted-foreground">({imageUrls.length}/{MAX_IMAGES})</span>
+            </Label>
+            {imageUrls.length > 0 && (
+              <div className="grid grid-cols-2 gap-2 my-2">
+                {imageUrls.map((url, idx) => (
+                  <div key={idx} className="relative group">
+                    <img src={url} alt={`upload ${idx + 1}`} className="w-full h-24 object-cover rounded-md border border-border" />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(idx)}
+                      className="absolute -top-2 -right-2 p-1 rounded-full bg-destructive text-destructive-foreground"
+                      aria-label="Remove image"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            {imageUrls.length < MAX_IMAGES && (
+              <ImageUpload bucket="posts" value="" onChange={addImage} />
+            )}
           </div>
           <div>
             <Label>Post date <span className="text-xs text-muted-foreground">(optional override)</span></Label>

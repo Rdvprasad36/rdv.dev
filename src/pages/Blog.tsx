@@ -142,9 +142,32 @@ export default function Blog() {
                     </div>
                     <p className="whitespace-pre-wrap text-sm leading-relaxed line-clamp-6">{p.content}</p>
                   </div>
-                  {p.image_url && (
-                    <img src={p.image_url} alt="Post" loading="lazy" className="w-full max-h-64 object-cover" />
-                  )}
+                  {(() => {
+                    const imgs: string[] = (Array.isArray(p.image_urls) && p.image_urls.length)
+                      ? p.image_urls
+                      : p.image_url ? [p.image_url] : [];
+                    if (imgs.length === 0) return null;
+                    if (imgs.length === 1) {
+                      return <img src={imgs[0]} alt="Post" loading="lazy" className="w-full max-h-64 object-cover" />;
+                    }
+                    return (
+                      <div className={`grid gap-0.5 ${imgs.length === 2 ? "grid-cols-2" : "grid-cols-2"}`}>
+                        {imgs.slice(0, 4).map((src, i) => (
+                          <div
+                            key={i}
+                            className={`relative ${imgs.length === 3 && i === 0 ? "col-span-2" : ""}`}
+                          >
+                            <img
+                              src={src}
+                              alt={`Post image ${i + 1}`}
+                              loading="lazy"
+                              className="w-full h-32 object-cover"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
                   <div className="mt-auto px-4 py-2 border-t border-border/40">
                     <Button
                       variant="ghost"

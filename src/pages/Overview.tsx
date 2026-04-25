@@ -49,12 +49,22 @@ export default function Overview() {
   const { isAdmin } = useAuth();
   const queryClient = useQueryClient();
 
+  async function getMinSortOrder(table: string): Promise<number> {
+    const { data } = await (supabase.from(table as any) as any)
+      .select("sort_order")
+      .order("sort_order", { ascending: true })
+      .limit(1);
+    const min = data?.[0]?.sort_order;
+    return typeof min === "number" ? min - 1 : 0;
+  }
+
   async function addOverviewSection() {
+    const sort_order = await getMinSortOrder("overview_sections");
     const { error } = await supabase
       .from("overview_sections")
-      .insert({ title: "New section", description: "", icon: "Layers", sort_order: 999 });
+      .insert({ title: "New section", description: "", icon: "Layers", sort_order });
     if (error) return toast.error(error.message);
-    toast.success("Card added");
+    toast.success("Card added at top");
     queryClient.invalidateQueries({ queryKey: ["overview_sections"] });
   }
 
@@ -74,10 +84,12 @@ export default function Overview() {
     queryClient.invalidateQueries({ queryKey: [queryKey] });
   }
 
-  async function addRow(table: string, payload: any, queryKey: string) {
-    const { error } = await (supabase.from(table as any) as any).insert(payload);
+  /** Adds a new row at the TOP by giving it the smallest sort_order. */
+  async function addRowAtTop(table: string, payload: any, queryKey: string) {
+    const sort_order = await getMinSortOrder(table);
+    const { error } = await (supabase.from(table as any) as any).insert({ ...payload, sort_order });
     if (error) return toast.error(error.message);
-    toast.success("Added");
+    toast.success("Added to top");
     queryClient.invalidateQueries({ queryKey: [queryKey] });
   }
 

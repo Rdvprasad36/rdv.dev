@@ -42,22 +42,10 @@ export default function Auth() {
             <div className="inline-flex p-3 rounded-full bg-primary/10 mb-3">
               <LogIn className="h-5 w-5 text-primary" />
             </div>
-            <h1 className="text-2xl font-bold">Admin sign in</h1>
+            <h1 className="text-2xl font-bold">Welcome admin to your portfolio</h1>
             <p className="text-sm text-muted-foreground mt-2">
-              This sign‑in is for the <span className="font-semibold text-foreground">website owner</span> only.
+              Admin can edit this website.
             </p>
-            <div className="mt-3 text-xs text-muted-foreground rounded-md bg-secondary/60 border border-border/60 p-3 text-left">
-              <p className="font-semibold text-foreground mb-1">Admin features unlock:</p>
-              <ul className="list-disc list-inside space-y-0.5">
-                <li>Edit profile, bio, contact & resume</li>
-                <li>Manage experience, education, skills & achievements</li>
-                <li>Add / remove projects, posts & logo designs</li>
-                <li>Read inquiries from the contact form</li>
-              </ul>
-              <p className="mt-2 text-[11px] text-muted-foreground/80">
-                Visitors can browse everything without signing in.
-              </p>
-            </div>
           </div>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>

@@ -11,11 +11,13 @@ import {
   Github,
   BookOpen,
   Mail,
+  Shield,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 import logoWhite from "@/assets/logo-white.png";
 import logoBlack from "@/assets/logo-black.png";
 import { cn } from "@/lib/utils";
@@ -33,6 +35,35 @@ export function Navbar() {
   const { user, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    if (!isAdmin) {
+      setUnreadCount(0);
+      return;
+    }
+    let active = true;
+    async function loadUnread() {
+      const { count } = await supabase
+        .from("inquiries")
+        .select("id", { count: "exact", head: true })
+        .eq("is_read", false);
+      if (active) setUnreadCount(count ?? 0);
+    }
+    loadUnread();
+    const channel = supabase
+      .channel("inquiries-nav")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "inquiries" },
+        () => loadUnread()
+      )
+      .subscribe();
+    return () => {
+      active = false;
+      supabase.removeChannel(channel);
+    };
+  }, [isAdmin]);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 glass">

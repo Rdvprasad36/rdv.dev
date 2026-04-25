@@ -69,16 +69,16 @@ export default function Admin() {
   }
 
   return (
-    <Section eyebrow="CMS" title="Admin Dashboard" description="Manage your portfolio content.">
-      <Tabs defaultValue="profile">
+    <Section eyebrow="CMS" title="Admin Dashboard" description="Manage your portfolio content and read messages from visitors.">
+      <Tabs defaultValue="inquiries">
         <TabsList className="flex-wrap h-auto">
+          <TabsTrigger value="inquiries">Messages</TabsTrigger>
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="overview">Overview Sections</TabsTrigger>
           <TabsTrigger value="experience">Experience</TabsTrigger>
           <TabsTrigger value="education">Education</TabsTrigger>
           <TabsTrigger value="skills">Skills</TabsTrigger>
           <TabsTrigger value="achievements">Achievements</TabsTrigger>
-          <TabsTrigger value="inquiries">Inquiries</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile" className="mt-6">

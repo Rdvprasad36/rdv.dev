@@ -414,7 +414,7 @@ export default function Overview() {
                           size="sm"
                           className="ml-auto"
                           onClick={() =>
-                            addRow(
+                            addRowAtTop(
                               "experience",
                               { role: "New role", company: "Company", duration: "", category: cat, sort_order: 999 },
                               "experience"
@@ -527,7 +527,7 @@ export default function Overview() {
                 size="sm"
                 className="ml-auto"
                 onClick={() =>
-                  addRow(
+                  addRowAtTop(
                     "education",
                     { institution: "New school", degree: "", field: "", duration: "", sort_order: 999 },
                     "education"
@@ -600,7 +600,7 @@ export default function Overview() {
                 size="sm"
                 className="ml-auto"
                 onClick={() =>
-                  addRow(
+                  addRowAtTop(
                     "achievements",
                     { title: "New achievement", description: "", date: "", sort_order: 999 },
                     "achievements"

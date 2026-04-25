@@ -3,6 +3,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
@@ -49,12 +50,22 @@ export default function Overview() {
   const { isAdmin } = useAuth();
   const queryClient = useQueryClient();
 
+  async function getMinSortOrder(table: string): Promise<number> {
+    const { data } = await (supabase.from(table as any) as any)
+      .select("sort_order")
+      .order("sort_order", { ascending: true })
+      .limit(1);
+    const min = data?.[0]?.sort_order;
+    return typeof min === "number" ? min - 1 : 0;
+  }
+
   async function addOverviewSection() {
+    const sort_order = await getMinSortOrder("overview_sections");
     const { error } = await supabase
       .from("overview_sections")
-      .insert({ title: "New section", description: "", icon: "Layers", sort_order: 999 });
+      .insert({ title: "New section", description: "", icon: "Layers", sort_order });
     if (error) return toast.error(error.message);
-    toast.success("Card added");
+    toast.success("Card added at top");
     queryClient.invalidateQueries({ queryKey: ["overview_sections"] });
   }
 
@@ -74,10 +85,12 @@ export default function Overview() {
     queryClient.invalidateQueries({ queryKey: [queryKey] });
   }
 
-  async function addRow(table: string, payload: any, queryKey: string) {
-    const { error } = await (supabase.from(table as any) as any).insert(payload);
+  /** Adds a new row at the TOP by giving it the smallest sort_order. */
+  async function addRowAtTop(table: string, payload: any, queryKey: string) {
+    const sort_order = await getMinSortOrder(table);
+    const { error } = await (supabase.from(table as any) as any).insert({ ...payload, sort_order });
     if (error) return toast.error(error.message);
-    toast.success("Added");
+    toast.success("Added to top");
     queryClient.invalidateQueries({ queryKey: [queryKey] });
   }
 
@@ -180,7 +193,26 @@ export default function Overview() {
                 className="relative h-48 w-48 md:h-56 md:w-56 rounded-full object-cover border-4 border-background shadow-xl"
               />
               {profile?.is_available && (
-                <span className="absolute bottom-3 right-3 h-5 w-5 rounded-full bg-success border-4 border-background animate-pulse" />
+                <HoverCard openDelay={80} closeDelay={120}>
+                  <HoverCardTrigger asChild>
+                    <button
+                      type="button"
+                      aria-label="Available for new opportunities"
+                      className="absolute bottom-3 right-3 h-5 w-5 rounded-full bg-success border-4 border-background animate-pulse focus:outline-none focus:ring-2 focus:ring-success/60"
+                    />
+                  </HoverCardTrigger>
+                  <HoverCardContent side="top" align="end" className="w-64 p-3 text-sm">
+                    <div className="flex items-start gap-2">
+                      <span className="mt-1 h-2.5 w-2.5 rounded-full bg-success animate-pulse shrink-0" />
+                      <div>
+                        <p className="font-semibold text-success">Available for new opportunities</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          Open to internships, full-time roles & freelance projects.
+                        </p>
+                      </div>
+                    </div>
+                  </HoverCardContent>
+                </HoverCard>
               )}
             </div>
 
@@ -402,7 +434,7 @@ export default function Overview() {
                           size="sm"
                           className="ml-auto"
                           onClick={() =>
-                            addRow(
+                            addRowAtTop(
                               "experience",
                               { role: "New role", company: "Company", duration: "", category: cat, sort_order: 999 },
                               "experience"
@@ -479,26 +511,73 @@ export default function Overview() {
         )}
 
         {/* SKILLS grouped */}
-        {skills.length > 0 && (
+        {(skills.length > 0 || isAdmin) && (
           <Card className="p-6 md:p-8">
             <div className="flex items-center gap-2 mb-6">
               <Code2 className="h-5 w-5 text-primary" />
               <h2 className="text-xl font-bold">Skills</h2>
+              {isAdmin && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="ml-auto"
+                  onClick={() =>
+                    addRowAtTop(
+                      "skills",
+                      { name: "New skill", category: "Other", proficiency: 80 },
+                      "skills"
+                    )
+                  }
+                >
+                  <Plus className="h-3.5 w-3.5 mr-1.5" /> Add
+                </Button>
+              )}
             </div>
-            <div className="space-y-5">
-              {(Object.entries(skillsByCategory) as [string, any[]][]).map(([cat, list]) => (
-                <div key={cat}>
-                  <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-2">{cat}</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    {list.map((s) => (
-                      <div key={s.id} className="text-sm px-3 py-2 rounded-md border border-border bg-card hover:border-primary/40 transition-colors text-center">
-                        {s.name}
-                      </div>
-                    ))}
+            {skills.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No skills yet. Click "Add" to create one.</p>
+            ) : (
+              <div className="space-y-5">
+                {(Object.entries(skillsByCategory) as [string, any[]][]).map(([cat, list]) => (
+                  <div key={cat}>
+                    <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-2">{cat}</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {list.map((s) => (
+                        <div
+                          key={s.id}
+                          className="relative group text-sm px-3 py-2 rounded-md border border-border bg-card hover:border-primary/40 transition-colors text-center"
+                        >
+                          {s.name}
+                          {isAdmin && (
+                            <div className="absolute top-0.5 right-0.5 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <InlineEdit
+                                table="skills"
+                                rowId={s.id}
+                                row={s}
+                                invalidateKeys={["skills"]}
+                                label="Edit skill"
+                                fields={[
+                                  { key: "name", label: "Name" },
+                                  { key: "category", label: "Category" },
+                                ]}
+                              />
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6"
+                                onClick={() => removeRow("skills", s.id, "skills")}
+                                aria-label="Delete"
+                              >
+                                <Trash2 className="h-3 w-3 text-destructive" />
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </Card>
         )}
       </div>
@@ -515,7 +594,7 @@ export default function Overview() {
                 size="sm"
                 className="ml-auto"
                 onClick={() =>
-                  addRow(
+                  addRowAtTop(
                     "education",
                     { institution: "New school", degree: "", field: "", duration: "", sort_order: 999 },
                     "education"
@@ -588,7 +667,7 @@ export default function Overview() {
                 size="sm"
                 className="ml-auto"
                 onClick={() =>
-                  addRow(
+                  addRowAtTop(
                     "achievements",
                     { title: "New achievement", description: "", date: "", sort_order: 999 },
                     "achievements"

@@ -192,7 +192,26 @@ export default function Overview() {
                 className="relative h-48 w-48 md:h-56 md:w-56 rounded-full object-cover border-4 border-background shadow-xl"
               />
               {profile?.is_available && (
-                <span className="absolute bottom-3 right-3 h-5 w-5 rounded-full bg-success border-4 border-background animate-pulse" />
+                <HoverCard openDelay={80} closeDelay={120}>
+                  <HoverCardTrigger asChild>
+                    <button
+                      type="button"
+                      aria-label="Available for new opportunities"
+                      className="absolute bottom-3 right-3 h-5 w-5 rounded-full bg-success border-4 border-background animate-pulse focus:outline-none focus:ring-2 focus:ring-success/60"
+                    />
+                  </HoverCardTrigger>
+                  <HoverCardContent side="top" align="end" className="w-64 p-3 text-sm">
+                    <div className="flex items-start gap-2">
+                      <span className="mt-1 h-2.5 w-2.5 rounded-full bg-success animate-pulse shrink-0" />
+                      <div>
+                        <p className="font-semibold text-success">Available for new opportunities</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          Open to internships, full-time roles & freelance projects.
+                        </p>
+                      </div>
+                    </div>
+                  </HoverCardContent>
+                </HoverCard>
               )}
             </div>
 
